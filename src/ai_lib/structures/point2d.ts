@@ -3,7 +3,7 @@ import { Hashable } from './hash_set';
 export class Point2d implements Hashable {
     public x: number;
     public y: number;
-    
+
     constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
