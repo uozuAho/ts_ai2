@@ -7,12 +7,13 @@ export class UniqueHashSet<T extends Hashable> {
     private map: Map<string, T> = new Map();
 
     add(thing: T) {
-        if (this.contains(thing))
-            throw new Error("already in set: " + thing);
+        if (this.contains(thing)) {
+            throw new Error('already in set: ' + thing);
+        }
         this.map.set(thing.hash(), thing);
     }
 
-    size() : number {
+    size(): number {
         return this.map.size;
     }
 
@@ -24,17 +25,19 @@ export class UniqueHashSet<T extends Hashable> {
         return this.map.has(thing.hash());
     }
 
-    containsHash(hash: string) : boolean {
+    containsHash(hash: string): boolean {
         return this.map.has(hash);
     }
 
-    getItemByHash(hash: string) : T {
-        if (!this.map.has(hash))
-            throw new Error("set does not contain hash " + hash);
+    getItemByHash(hash: string): T {
+        if (!this.map.has(hash)) {
+            throw new Error('set does not contain hash ' + hash);
+        }
         return this.map.get(hash);
     }
 
-    items() : T[] {
-        return [...this.map.values()]
+    // todo: this should return an iterable
+    items(): T[] {
+        return Array.from(this.map.values());
     }
 }
