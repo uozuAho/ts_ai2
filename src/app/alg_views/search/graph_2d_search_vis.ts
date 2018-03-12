@@ -13,6 +13,9 @@ export class Graph2dSearchVisualiser {
     private _problem: GraphSearchProblem<Point2d>;
     private _generateSolver: (problem: SearchProblem<Point2d, Point2d>, goal: Point2d) =>
         SearchAlgorithm<Point2d, Point2d>;
+    private _solver: SearchAlgorithm<Point2d, Point2d>;
+    private _diagram: Graph2dSearchDiagram;
+    private _interval: any;
 
     constructor(canvasId: string, height: number, width: number,
             generateSolver: (problem: SearchProblem<Point2d, Point2d>, goal: Point2d) =>
@@ -22,6 +25,7 @@ export class Graph2dSearchVisualiser {
         this._width = width;
         this._problem = this.generateProblem();
         this._generateSolver = generateSolver;
+        this.reset();
     }
 
     private generateProblem() {
@@ -30,33 +34,27 @@ export class Graph2dSearchVisualiser {
         return new GraphSearchProblem<Point2d>(graph, nodes[0], nodes[100]);
     }
 
-    public run() {
-        let solver: SearchAlgorithm<Point2d, Point2d>;
-        let diagram: Graph2dSearchDiagram;
+    public reset() {
+        this._solver = this._generateSolver(this._problem, this._problem.goal);
         const max_edge_cost = Math.max(...this._problem.graph.get_edgesT().map(e => e.cost));
+        this._diagram = new Graph2dSearchDiagram(this._canvasId, this._height, this._width,
+            this._problem, this._solver, max_edge_cost);
+        this.step();
+    }
 
-        const init = () => {
-            solver = this._generateSolver(this._problem, this._problem.goal);
-            diagram = new Graph2dSearchDiagram(this._canvasId, this._height, this._width,
-                this._problem, solver, max_edge_cost);
-            step();
-        };
+    public step() {
+        this._solver.step();
+        this._diagram.redraw();
+        if (this._solver.isFinished) {
+            clearInterval(this._interval);
+        }
+    }
 
-        let interval: any;
-        const step = () => {
-            solver.step();
-            diagram.redraw();
-            if (solver.isFinished) {
-                clearInterval(interval);
-            }
-        };
+    public go() {
+        this._interval = setInterval(() => this.step(), 100);
+    }
 
-        document.getElementById('btn_go').onclick = () => { interval = setInterval(step, 100); };
-        document.getElementById('btn_stop').onclick = () => clearInterval(interval);
-        document.getElementById('btn_step').onclick = step;
-        document.getElementById('btn_reset').onclick = init;
-
-        init();
-        document.getElementById('btn_go').click();
+    public stop() {
+        clearInterval(this._interval);
     }
 }
