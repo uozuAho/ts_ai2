@@ -1,4 +1,4 @@
-import { TinyQueue } from 'tinyqueue';
+import * as TinyQueue from 'tinyqueue';
 
 export class PriorityQueue<T> {
 
@@ -7,18 +7,19 @@ export class PriorityQueue<T> {
     private _compare: (a: T, b: T) => number;
 
     constructor(data: T[] = [], compare: (a: T, b: T) => number = null) {
-        if (compare !== null)
+        if (compare !== null) {
             this._tinyqueue = new TinyQueue(data, compare);
-        else
+        } else {
             this._tinyqueue = new TinyQueue(data);
+        }
         this._compare = compare;
     }
 
-    public push(item: T) : void {
+    public push(item: T): void {
         this._tinyqueue.push(item);
     }
 
-    public pop() : T {
+    public pop(): T {
         return this._tinyqueue.pop();
     }
 }
