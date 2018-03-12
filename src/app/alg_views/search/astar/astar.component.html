@@ -1,8 +1,8 @@
 <h1>A* Search</h1>
 <div id="div_buttons">
-  <button id="btn_go">go</button>
-  <button id="btn_stop">stop</button>
-  <button id="btn_step">step</button>
-  <button id="btn_reset">reset</button>
+  <button mat-button (click)="go()">go</button>
+  <button mat-button (click)="stop()">stop</button>
+  <button mat-button (click)="step()">step</button>
+  <button mat-button (click)="reset()">reset</button>
 </div>
 <canvas id="aStarCanvas" height="600" width="600"></canvas>
