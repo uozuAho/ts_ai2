@@ -5,12 +5,14 @@ import { MatDialogModule, MatInputModule, MatButtonModule, MatSidenavModule } fr
 
 import { AppComponent } from './app.component';
 import { AstarComponent } from './alg_views/search/astar/astar.component';
+import { BreadthFirstSearchComponent } from './alg_views/search/breadth-first-search/breadth-first-search.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    AstarComponent
+    AstarComponent,
+    BreadthFirstSearchComponent
   ],
   imports: [
     BrowserModule,
