@@ -6,17 +6,16 @@ export class FifoQueue<T> {
         if (this.isEmpty()) {
             this.start = new QueueItem(thing);
             this.end = this.start;
-        }
-        else {
-            let newEnd = new QueueItem(thing);
+        } else {
+            const newEnd = new QueueItem(thing);
             this.end.next = newEnd;
             this.end = newEnd;
         }
     }
 
-    public pop() : T {
-        if (this.isEmpty()) throw new Error('queue is empty');
-        let oldStart = this.start;
+    public pop(): T {
+        if (this.isEmpty()) { throw new Error('queue is empty'); }
+        const oldStart = this.start;
         this.start = this.start.next;
         return oldStart.data;
     }
@@ -27,8 +26,8 @@ export class FifoQueue<T> {
 }
 
 class QueueItem<T> {
-    public data: T
-    public next: QueueItem<T>
+    public data: T;
+    public next: QueueItem<T>;
     constructor(thing: T) {
         this.data = thing;
     }

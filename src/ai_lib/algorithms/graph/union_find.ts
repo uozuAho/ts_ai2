@@ -25,7 +25,7 @@ export class UnionFind {
      * @throws if n < 0
      */
     constructor(n: number) {
-        if (n < 0) throw "n must be >= 0";
+        if (n < 0) { throw new Error('n must be >= 0'); }
         this._count = n;
         this._parent = [];
         this._size = [];
@@ -41,14 +41,15 @@ export class UnionFind {
     }
 
     /** Returns the component identifier for the component containing site p */
-    public find(p: number) : number {
+    public find(p: number): number {
         this._validate(p);
         let root = p;
-        while (root != this._parent[root])
+        while (root !== this._parent[root]) {
             root = this._parent[root];
+        }
         // compress path to root
-        while (p != root) {
-            let newp = this._parent[p];
+        while (p !== root) {
+            const newp = this._parent[p];
             this._parent[p] = root;
             p = newp;
         }
@@ -57,7 +58,7 @@ export class UnionFind {
 
    /** Returns true if the the two sites are in the same component */
     public connected(p: number, q: number): boolean {
-        return this.find(p) == this.find(q);
+        return this.find(p) === this.find(q);
     }
 
     /**
@@ -70,16 +71,15 @@ export class UnionFind {
      *         both {@code 0 <= p < n} and {@code 0 <= q < n}
      */
     public union(p: number, q: number): void {
-        let rootP = this.find(p);
-        let rootQ = this.find(q);
-        if (rootP == rootQ) return;
+        const rootP = this.find(p);
+        const rootQ = this.find(q);
+        if (rootP === rootQ) { return; }
 
         // make smaller root point to larger one
         if (this._size[rootP] < this._size[rootQ]) {
             this._parent[rootP] = rootQ;
             this._size[rootQ] += this._size[rootP];
-        }
-        else {
+        } else {
             this._parent[rootQ] = rootP;
             this._size[rootP] += this._size[rootQ];
         }
@@ -88,9 +88,9 @@ export class UnionFind {
 
     // validate that p is a valid index
     private _validate(p: number): void {
-        let n = this._parent.length;
+        const n = this._parent.length;
         if (p < 0 || p >= n) {
-            throw "index " + p + " is not between 0 and " + (n-1);
+            throw new Error('index ' + p + ' is not between 0 and ' + (n - 1));
         }
     }
 }

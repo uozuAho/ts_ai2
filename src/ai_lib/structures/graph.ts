@@ -1,4 +1,4 @@
-import { Edge, IGraph } from "./igraph";
+import { Edge, IGraph } from './igraph';
 
 /** Weighted graph, uses numbers to represent nodes */
 abstract class GraphBase {
@@ -18,14 +18,14 @@ abstract class GraphBase {
         return this._n;
     }
 
-    public set_num_nodes(n: number) : void {
+    public set_num_nodes(n: number): void {
         this._n = n;
     }
 
     /** Get edges incident to the given node */
     public adjacent(n: number): Edge[] {
         this.validate_idx(n);
-        let adj = this._adj[n];
+        const adj = this._adj[n];
         return adj === undefined ? [] : adj;
     }
 
@@ -37,15 +37,16 @@ abstract class GraphBase {
     protected add_directed_edge(p: number, q: number, weight: number = 1): void {
         this.validate_idx(p);
         this.validate_idx(q);
-        let edge = new Edge(p, q, weight);
-        if (this._adj[p] === undefined)
+        const edge = new Edge(p, q, weight);
+        if (this._adj[p] === undefined) {
             this._adj[p] = [edge];
-        else
+        } else {
             this._adj[p].push(edge);
+        }
     }
 
     protected validate_idx(n: number): void {
-        if (n < 0 || n >= this._n) throw "invalid index: " + n;
+        if (n < 0 || n >= this._n) { throw new Error('invalid index: ' + n); }
     }
 }
 
@@ -63,16 +64,15 @@ export class Graph extends GraphBase implements IGraph {
      *  cheers to princeton algs for this: https://algs4.cs.princeton.edu/43mst/EdgeWeightedGraph.java.html
      */
     public get_edges(): Edge[] {
-        let edges: Edge[] = [];
+        const edges: Edge[] = [];
         for (let v = 0; v < this._n; v++) {
             let self_loop = 0;
             for (const edge of this.adjacent(v)) {
-                if (edge.other(v) > v)
+                if (edge.other(v) > v) {
                     // Since each undirected edge consists of two directed edges, return one of each
                     edges.push(edge);
-                // add only one copy of each self loop (self loops will be consecutive)
-                else if (edge.other(v) == v) {
-                    if (self_loop % 2 == 0) edges.push(edge);
+                } else if (edge.other(v) === v) {
+                    if (self_loop % 2 === 0) { edges.push(edge); }
                     self_loop++;
                 }
             }
@@ -89,10 +89,11 @@ export class DiGraph extends GraphBase implements IGraph {
     }
 
     public get_edges(): Edge[] {
-        let edges: Edge[] = [];
+        const edges: Edge[] = [];
         for (const adj of this._adj) {
-            if (adj !== undefined)
+            if (adj !== undefined) {
                 edges.concat(adj);
+            }
         }
         return edges;
     }

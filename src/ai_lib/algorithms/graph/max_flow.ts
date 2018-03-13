@@ -1,5 +1,5 @@
-import { FlowEdge, FlowNetwork } from "../../structures/flow_network";
-import { FifoQueue } from "../../structures/fifo_queue";
+import { FlowEdge, FlowNetwork } from '../../structures/flow_network';
+import { FifoQueue } from '../../structures/fifo_queue';
 
 /*
  *  FordFulkerson implementation for finding max flow in a flow network.
@@ -42,10 +42,12 @@ export class MaxFlow {
         this._num_vertices = network.num_vertices();
         this.validate(source);
         this.validate(sink);
-        if (source == sink)
-            throw new Error("Source equals sink");
-        if (!this.is_feasible(network, source, sink))
-            throw new Error("Initial flow is infeasible");
+        if (source === sink) {
+            throw new Error('Source equals sink');
+        }
+        if (!this.is_feasible(network, source, sink)) {
+            throw new Error('Initial flow is infeasible');
+        }
 
         this._edges = new Set<FlowEdge>();
 
@@ -55,14 +57,14 @@ export class MaxFlow {
 
             // compute bottleneck capacity
             let bottle = Number.MAX_VALUE;
-            for (let v = sink; v != source; v = this._edgeTo[v].other(v)) {
+            for (let v = sink; v !== source; v = this._edgeTo[v].other(v)) {
                 bottle = Math.min(bottle, this._edgeTo[v].residual_capacity_to(v));
                 // add to max flow edges
                 this._edges.add(this._edgeTo[v]);
             }
 
             // augment flow
-            for (let v = sink; v != source; v = this._edgeTo[v].other(v)) {
+            for (let v = sink; v !== source; v = this._edgeTo[v].other(v)) {
                 this._edgeTo[v].add_residual_flow_to(v, bottle);
             }
 
@@ -70,8 +72,9 @@ export class MaxFlow {
         }
 
         // check optimality conditions
-        if (!this.check(network, source, sink))
-            throw new Error("uh... not optimal")
+        if (!this.check(network, source, sink)) {
+            throw new Error('uh... not optimal');
+        }
     }
 
     /**
@@ -90,7 +93,7 @@ export class MaxFlow {
      */
     public is_in_cut(v: number): boolean {
         this.validate(v);
-        if (!this._marked[v]) return false;
+        if (!this._marked[v]) { return false; }
         return this._marked[v];
     }
 
@@ -101,8 +104,9 @@ export class MaxFlow {
 
     // throw an Error if v is outside prescibed range
     private validate(v: number): void {
-        if (v < 0 || v >= this._num_vertices)
-            throw new Error("vertex " + v + " is not between 0 and " + (this._num_vertices-1));
+        if (v < 0 || v >= this._num_vertices) {
+            throw new Error('vertex ' + v + ' is not between 0 and ' + (this._num_vertices - 1));
+        }
     }
 
     /** Is there an augmenting path?
@@ -115,14 +119,14 @@ export class MaxFlow {
         this._marked = [];
 
         // breadth-first search
-        let frontier = new FifoQueue<number>();
+        const frontier = new FifoQueue<number>();
         frontier.push(s);
         this._marked[s] = true;
         while (!frontier.isEmpty() && !this._marked[t]) {
-            let v = frontier.pop();
+            const v = frontier.pop();
 
             for (const edge of network.incident(v)) {
-                let adj = edge.other(v);
+                const adj = edge.other(v);
 
                 // if residual capacity to adjacent vertex
                 if (edge.residual_capacity_to(adj) > 0) {
@@ -143,8 +147,7 @@ export class MaxFlow {
     private excess(network: FlowNetwork, v: number): number {
         let excess = 0.0;
         for (const edge of network.incident(v)) {
-            if (v == edge.from()) excess -= edge.flow();
-            else                  excess += edge.flow();
+            if (v === edge.from()) { excess -= edge.flow(); } else {                  excess += edge.flow(); }
         }
         return excess;
     }
@@ -167,8 +170,7 @@ export class MaxFlow {
             return false;
         }
         for (let v = 0; v < G.num_vertices(); v++) {
-            if (v == s || v == t) continue;
-            else if (Math.abs(this.excess(G, v)) > MaxFlow.FLOATING_POINT_EPSILON) {
+            if (v === s || v === t) { continue; } else if (Math.abs(this.excess(G, v)) > MaxFlow.FLOATING_POINT_EPSILON) {
                 return false;
             }
         }
@@ -193,8 +195,9 @@ export class MaxFlow {
         let mincutValue = 0.0;
         for (let v = 0; v < G.num_vertices(); v++) {
             for (const e of G.incident(v)) {
-                if ((v == e.from()) && this.is_in_cut(e.from()) && !this.is_in_cut(e.to()))
+                if ((v === e.from()) && this.is_in_cut(e.from()) && !this.is_in_cut(e.to())) {
                     mincutValue += e.capacity();
+                }
             }
         }
 

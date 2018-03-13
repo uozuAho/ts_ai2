@@ -6,16 +6,17 @@ import {Mst} from './mst';
  *  Uses algorithm described in recitation 9 of the AI book.
 */
 export class TspSolver {
-    public solve(graph: IGraph) : void {
-        let num_nodes = graph.num_nodes();
+    public solve(graph: IGraph): void {
+        const num_nodes = graph.num_nodes();
 
-        let mst = new Mst(graph);
+        const mst = new Mst(graph);
 
         // get indices of nodes with odd degree in mst
-        let odd_degree_nodes: number[] = [];
+        const odd_degree_nodes: number[] = [];
         for (let i = 0; i < num_nodes; i++) {
-            if (mst.degree(i) % 2 != 0)
+            if (mst.degree(i) % 2 !== 0) {
                 odd_degree_nodes.push(i);
+            }
         }
     }
 }
