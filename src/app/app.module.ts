@@ -9,6 +9,7 @@ import { AppComponent } from './app.component';
 import { AstarComponent } from './alg_views/search/astar/astar.component';
 import { BreadthFirstSearchComponent } from './alg_views/search/breadth-first-search/breadth-first-search.component';
 import { DepthFirstSearchComponent } from './alg_views/search/depth-first-search/depth-first-search.component';
+import { GreedyBestFirstSearchComponent } from './alg_views/search/greedy-best-first-search/greedy-best-first-search.component';
 
 
 @NgModule({
@@ -16,7 +17,8 @@ import { DepthFirstSearchComponent } from './alg_views/search/depth-first-search
     AppComponent,
     AstarComponent,
     BreadthFirstSearchComponent,
-    DepthFirstSearchComponent
+    DepthFirstSearchComponent,
+    GreedyBestFirstSearchComponent
   ],
   imports: [
     AppRoutingModule,
