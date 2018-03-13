@@ -1,1 +1,10 @@
-<app-astar></app-astar>
+<mat-sidenav-container class="example-container">
+    <mat-sidenav #sidenav mode="side">
+        <p><button mat-button (click)="sidenav.toggle()">close menu</button></p>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+        <p><button mat-button (click)="sidenav.toggle()">menu</button></p>
+        <app-astar></app-astar>
+    </mat-sidenav-content>
+</mat-sidenav-container>
