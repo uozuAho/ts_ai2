@@ -1,10 +1,12 @@
 <mat-sidenav-container class="example-container">
     <mat-sidenav #sidenav mode="side">
         <p><button mat-button (click)="sidenav.toggle()">close menu</button></p>
+        <p><a routerLink="/search/astar">A* search</a></p>
+        <p><a routerLink="/search/bfs">Breadth-first search</a></p>
     </mat-sidenav>
 
     <mat-sidenav-content>
         <p><button mat-button (click)="sidenav.toggle()">menu</button></p>
-        <app-astar></app-astar>
+        <router-outlet></router-outlet>
     </mat-sidenav-content>
 </mat-sidenav-container>
