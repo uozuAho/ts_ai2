@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialogModule, MatInputModule, MatButtonModule, MatSidenavModule } from '@angular/material';
 
@@ -13,6 +14,7 @@ import { GreedyBestFirstSearchComponent } from './alg_views/search/greedy-best-f
 import { IterativeDeepeningComponent } from './alg_views/search/iterative-deepening/iterative-deepening.component';
 import { GraphAlgViewerComponent } from './graph-alg-viewer/graph-alg-viewer.component';
 import { GraphEditorComponent } from './shared/graph-editor/graph-editor.component';
+import { EditNodeDialogComponent } from './shared/graph-editor/edit-node-dialog.component';
 
 
 @NgModule({
@@ -24,10 +26,12 @@ import { GraphEditorComponent } from './shared/graph-editor/graph-editor.compone
     GreedyBestFirstSearchComponent,
     IterativeDeepeningComponent,
     GraphAlgViewerComponent,
-    GraphEditorComponent
+    GraphEditorComponent,
+    EditNodeDialogComponent
   ],
   imports: [
     AppRoutingModule,
+    FormsModule,
     BrowserModule,
     BrowserAnimationsModule,
     MatDialogModule,
@@ -36,6 +40,9 @@ import { GraphEditorComponent } from './shared/graph-editor/graph-editor.compone
     MatSidenavModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [
+    EditNodeDialogComponent
+  ]
 })
 export class AppModule { }

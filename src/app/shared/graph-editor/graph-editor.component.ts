@@ -44,7 +44,6 @@ export class GraphEditorComponent implements AfterViewInit {
                         label: node.label,
                         id: node.id
                     }, function(result) {
-                        console.log(result);
                         node.label = result.label;
                         callback(node);
                     });
