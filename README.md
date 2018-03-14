@@ -1,10 +1,17 @@
 # Typescript ai playground
 
 Typescript implementation of stuff from [Artificial Intelligence: A Modern Approach][aibook],
-plus other 'ai' doodlings. ai_lib is a standalone library. All the angular stuff is for
-visualisation within a browser.
+plus other 'ai' doodlings.
 
 Currently migrating visualisations from https://github.com/uozuAho/ts_ai
+
+## Project structure
+
+- ai_lib/ is a standalone 'ai' library
+- console_apps/ contains 'ai' console apps. These can be run by compiling
+  the project to js (`npm run tsc` or `yarn tsc`), then running with nodejs
+- everything else is part of the angular framework, which contains
+  visualisations of some algorithms, and runs tests
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.1.
 
