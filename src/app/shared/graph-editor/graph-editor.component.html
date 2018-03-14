@@ -1,0 +1,11 @@
+<h2>Graph editor</h2>
+<ul>
+  <li>Drag graph files onto the canvas to load them</li>
+  <li>Press 'n' to add nodes, 'e' to add edges, 'esc' to go back</li>
+  <li>Double-click on nodes to edit them</li>
+</ul>
+<div class="editor-toolbar">
+  <button mat-button (click)="exportGraph()">Export</button>
+  <button mat-button (click)="clear()">Clear</button>
+</div>
+<div #graphEditorDiv id="graphEditorDiv"></div>

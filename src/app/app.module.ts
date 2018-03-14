@@ -11,6 +11,8 @@ import { BreadthFirstSearchComponent } from './alg_views/search/breadth-first-se
 import { DepthFirstSearchComponent } from './alg_views/search/depth-first-search/depth-first-search.component';
 import { GreedyBestFirstSearchComponent } from './alg_views/search/greedy-best-first-search/greedy-best-first-search.component';
 import { IterativeDeepeningComponent } from './alg_views/search/iterative-deepening/iterative-deepening.component';
+import { GraphAlgViewerComponent } from './graph-alg-viewer/graph-alg-viewer.component';
+import { GraphEditorComponent } from './shared/graph-editor/graph-editor.component';
 
 
 @NgModule({
@@ -20,7 +22,9 @@ import { IterativeDeepeningComponent } from './alg_views/search/iterative-deepen
     BreadthFirstSearchComponent,
     DepthFirstSearchComponent,
     GreedyBestFirstSearchComponent,
-    IterativeDeepeningComponent
+    IterativeDeepeningComponent,
+    GraphAlgViewerComponent,
+    GraphEditorComponent
   ],
   imports: [
     AppRoutingModule,
