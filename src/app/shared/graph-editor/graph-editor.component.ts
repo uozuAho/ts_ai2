@@ -5,6 +5,7 @@ import * as FileSaver from 'file-saver';
 
 import { VisNetwork, NodeDef, EdgeDef, NetworkDef } from '../../../libs/vis_wrappers/vis_network';
 import { EditNodeDialogComponent, EditNodeDialogData } from './edit-node-dialog.component';
+import { GraphT, randomSquareGraph } from '../../../ai_lib/structures/graphT';
 
 /** This is mainly a wrapper around vis's existing network editor.
  *  The interface has been modified for what I think is a better
@@ -102,6 +103,16 @@ export class GraphEditorComponent implements AfterViewInit {
             editFunc(node);
             this._network.updateNode(node);
         }
+    }
+
+    private generateRandomGraph() {
+        const bounds = this._network.getCurrentViewBounds();
+        console.log(bounds);
+        const graph = randomSquareGraph(bounds.maxy, bounds.maxx, 30);
+        let node_counter = 1;
+        const nodes = graph.get_nodes().map(n => new NodeDef(node_counter++, node_counter + '', n.x, n.y));
+        const edges = graph.get_edges().map(e => new EdgeDef(e.from, e.to));
+        this._network.setData(new NetworkDef(nodes, edges));
     }
 
     private openEditNodeDialog(node: EditNodeDialogData, onSubmit: (d: EditNodeDialogData) => void) {

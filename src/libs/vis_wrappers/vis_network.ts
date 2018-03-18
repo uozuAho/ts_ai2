@@ -136,6 +136,16 @@ export class VisNetwork {
         this._network.selectNodes(ids);
     }
 
+    public getCurrentViewBounds(): {minx: number, miny: number, maxx: number, maxy: number} {
+        const frame = this._network.canvas.frame;
+        return {
+            minx: frame.clientLeft,
+            miny: frame.clientTop,
+            maxx: frame.clientLeft + frame.clientWidth,
+            maxy: frame.clientTop + frame.clientHeight
+        };
+    }
+
     /** Convert a node definition into a vis node */
     private toVisNode(node_def: NodeDef): any {
         return node_def;
