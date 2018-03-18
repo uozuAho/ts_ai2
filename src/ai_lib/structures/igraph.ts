@@ -20,15 +20,15 @@ export class Edge {
 
     /** Compares weights. -1 if this is less than other, 0 if same, else 1 */
     public compare(other: Edge) {
-        if (this.weight < other.weight) return -1;
-        if (this.weight > other.weight) return 1;
+        if (this.weight < other.weight) { return -1; }
+        if (this.weight > other.weight) { return 1; }
         return 0;
     }
 
     /** Returns the other end of the edge to the given end */
     public other(n: number): number {
-        if (n == this.from) return this.to;
-        if (n == this.to) return this.from;
-        throw "invalid node: " + n;
+        if (n === this.from) { return this.to; }
+        if (n === this.to) { return this.from; }
+        throw new Error('invalid node: ' + n);
     }
 }

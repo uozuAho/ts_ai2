@@ -25,7 +25,7 @@ describe('PriorityQueue', function() {
     });
 
     it('object queue', function() {
-        let objQueue = new PriorityQueue<TestObj>([], (a, b) => TestObj.compare(a, b));
+        const objQueue = new PriorityQueue<TestObj>([], (a, b) => TestObj.compare(a, b));
         objQueue.push(new TestObj(5, '5'));
         objQueue.push(new TestObj(1, '1'));
         objQueue.push(new TestObj(3, '3'));

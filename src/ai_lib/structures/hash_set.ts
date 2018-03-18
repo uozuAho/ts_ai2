@@ -21,7 +21,7 @@ export class UniqueHashSet<T extends Hashable> {
         this.map.delete(thing.hash());
     }
 
-    contains(thing: T) : boolean {
+    contains(thing: T): boolean {
         return this.map.has(thing.hash());
     }
 
