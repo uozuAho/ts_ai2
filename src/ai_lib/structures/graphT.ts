@@ -141,7 +141,7 @@ export function randomSquareGraph(height: number, width: number, totalNodes: num
     for (let i = 0; i < totalNodes; i++) {
         graph.add_node(new Point2d(Math.random() * width, Math.random() * height));
     }
-    const minDistance2 = 1 * height * width / totalNodes;
+    const minDistance2 = 1.6 * height * width / totalNodes;
 
     const nodes = graph.get_nodes();
 

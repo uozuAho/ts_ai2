@@ -15,7 +15,7 @@ const routes: Routes = [
   { path: 'search/dfs', component: DepthFirstSearchComponent },
   { path: 'search/greedy_bfs', component: GreedyBestFirstSearchComponent },
   { path: 'search/ids', component: IterativeDeepeningComponent },
-  { path: 'graph_alg_viewer', component: GraphAlgViewerComponent }
+  { path: 'graph_alg_viewer', component: GraphAlgViewerComponent },
   { path: 'graph_general/mst', component: MstComponent },
 ];
 

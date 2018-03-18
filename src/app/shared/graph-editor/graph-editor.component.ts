@@ -109,8 +109,9 @@ export class GraphEditorComponent implements AfterViewInit {
         const bounds = this._network.getCurrentViewBounds();
         console.log(bounds);
         const graph = randomSquareGraph(bounds.maxy, bounds.maxx, 30);
-        let node_counter = 1;
-        const nodes = graph.get_nodes().map(n => new NodeDef(node_counter++, node_counter + '', n.x, n.y));
+        let node_counter = 0;
+        const nodes = graph.get_nodes().map(n => new NodeDef(node_counter, node_counter++ + '', n.x, n.y));
+        // note that edge 'from' & 'to' refer to the position of the node in the node array
         const edges = graph.get_edges().map(e => new EdgeDef(e.from, e.to));
         this._network.setData(new NetworkDef(nodes, edges));
     }
