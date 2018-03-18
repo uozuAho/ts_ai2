@@ -97,15 +97,10 @@ export class GraphEditorComponent implements AfterViewInit {
     }
 
     public editNode(id: string | number, editFunc: (node: NodeDef) => void) {
-        // save current node selection
-        const selectedNodes = this._network.getSelectedNodes();
         const node = this._network.getNode(id);
         if (node !== undefined) {
-            this._network.setEditNodeFunc(editFunc);
-            this._network.selectNodes([node.id]);
-            this._network.editNodeMode();
-            // restore saved selection
-            this._network.selectNodes(selectedNodes);
+            editFunc(node);
+            this._network.updateNode(node);
         }
     }
 

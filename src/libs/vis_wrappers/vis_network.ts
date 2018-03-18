@@ -128,11 +128,8 @@ export class VisNetwork {
         return this._nodes.get(id);
     }
 
-    public setEditNodeFunc(func: (node: NodeDef) => void) {
-        this._network.manipulation.options.editNode = (n, cb) => {
-            func(n);
-            cb(n);
-        };
+    public updateNode(node: NodeDef) {
+        this._nodes.update(node);
     }
 
     public selectNodes(ids: any[]) {
