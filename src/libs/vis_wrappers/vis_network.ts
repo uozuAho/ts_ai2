@@ -79,13 +79,17 @@ export class VisNetwork {
         return this._network.getSelectedNodes();
     }
 
-    /** Set (only) handler for click events */
+    /** Set handler for click events. Overrides any existing click handlers (?) */
     public setClickHandler(func: (params: any) => void) {
         this._network.on('click', func);
     }
 
     public setDoubleClickHandler(func: (params: any) => void) {
         this._network.on('doubleClick', func);
+    }
+
+    public setSelectNodeHandler(func: (params: any) => void) {
+        this._network.on('selectNode', func);
     }
 
     public redraw(): void {
@@ -122,6 +126,17 @@ export class VisNetwork {
 
     public getNode(id: string | number): NodeDef {
         return this._nodes.get(id);
+    }
+
+    public setEditNodeFunc(func: (node: NodeDef) => void) {
+        this._network.manipulation.options.editNode = (n, cb) => {
+            func(n);
+            cb(n);
+        };
+    }
+
+    public selectNodes(ids: any[]) {
+        this._network.selectNodes(ids);
     }
 
     /** Convert a node definition into a vis node */
@@ -171,6 +186,7 @@ export class NodeDef {
     public x: number;
     /** y coordinate (canvas) */
     public y: number;
+    public color: string;
 
     public constructor(id: string | number, label: string, x = 0, y = 0) {
         this.id = id;

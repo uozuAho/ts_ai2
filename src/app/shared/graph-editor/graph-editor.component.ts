@@ -21,7 +21,7 @@ export class GraphEditorComponent implements AfterViewInit {
     private _network: VisNetwork;
     private _isEditingNode: boolean;
 
-    @ViewChild('graphEditorDiv') _networkElem: ElementRef;
+    @ViewChild('graphEditorDiv') private _networkElem: ElementRef;
 
     constructor(private _dialogService: MatDialog) {
         // stupid 'never read' errors!
@@ -29,7 +29,8 @@ export class GraphEditorComponent implements AfterViewInit {
         if (this.handleKeyDown) {}
     }
 
-    ngAfterViewInit(): void {
+    /** Don't touch. Only public to implement interface */
+    public ngAfterViewInit(): void {
         const _ths = this;
         this._network = new VisNetwork(this._networkElem.nativeElement, {
             height: '401px',
@@ -69,16 +70,43 @@ export class GraphEditorComponent implements AfterViewInit {
         this._network.addNodeMode();
     }
 
+    /** Export the current graph to a file (auto browser download) */
     public exportGraph(): void {
         const def = this._network.toNetworkDef();
         const blob = new Blob([JSON.stringify(def, null, 2)], {type: 'text/plain;charset=utf-8'});
         FileSaver.saveAs(blob, 'graph.json');
     }
 
+    /** Clear all nodes and edges */
     public clear(): void {
         this._network.setData(new NetworkDef([], []));
         // clearing the network exits edit mode, so get back in there
         this._network.addNodeMode();
+    }
+
+    public exitEditMode(): void {
+        this._network.disableEditMode();
+    }
+
+    /** Set the handler for when a node is selected. Overwrites any existing handler. */
+    public setOnNodeSelected(func: (node: NodeDef) => void): void {
+        this._network.setSelectNodeHandler(params => {
+            const n = this._network.getNode(params.nodes[0]);
+            func(n);
+        });
+    }
+
+    public editNode(id: string | number, editFunc: (node: NodeDef) => void) {
+        // save current node selection
+        const selectedNodes = this._network.getSelectedNodes();
+        const node = this._network.getNode(id);
+        if (node !== undefined) {
+            this._network.setEditNodeFunc(editFunc);
+            this._network.selectNodes([node.id]);
+            this._network.editNodeMode();
+            // restore saved selection
+            this._network.selectNodes(selectedNodes);
+        }
     }
 
     private openEditNodeDialog(node: EditNodeDialogData, onSubmit: (d: EditNodeDialogData) => void) {
@@ -136,21 +164,21 @@ export class GraphEditorComponent implements AfterViewInit {
 
     /** file drag over handler. Does nothing, but file drop doesn't work without it */
     @HostListener('dragover', ['$event'])
-    public onDragOver(evt) {
+    private onDragOver(evt) {
         evt.preventDefault();
         evt.stopPropagation();
     }
 
     /** file drag leave handler. Does nothing, but file drop doesn't work without it */
     @HostListener('dragleave', ['$event'])
-    public onDragLeave(evt) {
+    private onDragLeave(evt) {
         evt.preventDefault();
         evt.stopPropagation();
     }
 
     /** Handle file drop events (load graph from file) */
     @HostListener('drop', ['$event'])
-    public onDrop(evt) {
+    private onDrop(evt) {
         const _this = this;
         evt.preventDefault();
         evt.stopPropagation();
