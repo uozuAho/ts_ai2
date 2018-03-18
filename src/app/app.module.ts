@@ -15,6 +15,7 @@ import { IterativeDeepeningComponent } from './alg_views/search/iterative-deepen
 import { GraphAlgViewerComponent } from './graph-alg-viewer/graph-alg-viewer.component';
 import { GraphEditorComponent } from './shared/graph-editor/graph-editor.component';
 import { EditNodeDialogComponent } from './shared/graph-editor/edit-node-dialog.component';
+import { MstComponent } from './alg_views/graph_general/mst/mst.component';
 
 
 @NgModule({
@@ -27,7 +28,8 @@ import { EditNodeDialogComponent } from './shared/graph-editor/edit-node-dialog.
     IterativeDeepeningComponent,
     GraphAlgViewerComponent,
     GraphEditorComponent,
-    EditNodeDialogComponent
+    EditNodeDialogComponent,
+    MstComponent
   ],
   imports: [
     AppRoutingModule,
