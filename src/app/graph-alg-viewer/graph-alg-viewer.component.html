@@ -1,1 +1,3 @@
-<app-graph-editor></app-graph-editor>
+<p>{{instructions}}</p>
+<button mat-button (click)="next()">{{nextButtonText}}</button>
+<app-graph-editor *ngIf="currentState.state === StateTypes.CreatingGraph"></app-graph-editor>
