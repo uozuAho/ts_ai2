@@ -3,9 +3,11 @@ import { MatDialog } from '@angular/material';
 
 import * as FileSaver from 'file-saver';
 
-import { VisNetwork, NodeDef, EdgeDef, NetworkDef } from '../../../libs/vis_wrappers/vis_network';
+import { VisNetwork, VisNode, VisEdge, VisNetworkDef } from '../../../libs/vis_wrappers/vis_network';
 import { EditNodeDialogComponent, EditNodeDialogData } from './edit-node-dialog.component';
 import { GraphT, randomSquareGraph } from '../../../ai_lib/structures/graphT';
+import { Graph } from '../../../ai_lib/structures/graph';
+import { IGraph } from '../../../ai_lib/structures/igraph';
 
 /** This is mainly a wrapper around vis's existing network editor.
  *  The interface has been modified for what I think is a better
@@ -31,7 +33,7 @@ export class GraphEditorComponent implements AfterViewInit {
         if (this.handleKeyDown) {}
     }
 
-    /** Don't touch. Only public to implement interface */
+    /** Not for public consumption. Only public to implement ng interface. */
     public ngAfterViewInit(): void {
         const _ths = this;
         this._network = new VisNetwork(this._networkElem.nativeElement, {
@@ -43,7 +45,7 @@ export class GraphEditorComponent implements AfterViewInit {
                     callback(data);
                     _ths._network.addNodeMode();
                 },
-                editNode: function (node: NodeDef, callback) {
+                editNode: function (node: VisNode, callback) {
                     _ths.openEditNodeDialog(<EditNodeDialogData> {
                         label: node.label,
                         id: node.id
@@ -59,6 +61,10 @@ export class GraphEditorComponent implements AfterViewInit {
             }
         });
 
+        this._network.setClickHandler(p => {
+            console.log(p);
+        });
+
         this._network.setDoubleClickHandler(p => {
             if (p.nodes.length === 1) {
                 this._network.editNodeMode();
@@ -68,16 +74,38 @@ export class GraphEditorComponent implements AfterViewInit {
         this._network.addNodeMode();
     }
 
+    /** Get the current graph as a VisNetworkDef */
+    public getVisNetworkDef(): VisNetworkDef {
+        return this._network.toNetworkDef();
+    }
+
+    /** Get an IGraph representation of the current graph */
+    public getGraph(): GraphT<VisNode> {
+        const nodes = this._network.getNodes();
+        // map node id --> array idx
+        const nodeIdxMap = new Map<string | number, number>();
+        for (let i = 0, node = nodes[i]; i < nodes.length; i++) {
+            nodeIdxMap.set(node.id, i);
+        }
+        const graph = new GraphT<VisNode>();
+        for (const edge of this._network.getEdges()) {
+            const fromIdx = nodeIdxMap.get(edge.from);
+            const toIdx = nodeIdxMap.get(edge.to);
+            graph.add_edge(fromIdx, toIdx);
+        }
+        return graph;
+    }
+
     /** Export the current graph to a file (auto browser download) */
-    public exportGraph(): void {
-        const def = this._network.toNetworkDef();
-        const blob = new Blob([JSON.stringify(def, null, 2)], {type: 'text/plain;charset=utf-8'});
+    public exportGraphToFile(): void {
+        const graph = this.getVisNetworkDef();
+        const blob = new Blob([JSON.stringify(graph, null, 2)], {type: 'text/plain;charset=utf-8'});
         FileSaver.saveAs(blob, 'graph.json');
     }
 
     /** Clear all nodes and edges */
     public clear(): void {
-        this._network.setData(new NetworkDef([], []));
+        this._network.setData(new VisNetworkDef([], []));
         // clearing the network exits edit mode, so get back in there
         this._network.addNodeMode();
     }
@@ -87,14 +115,14 @@ export class GraphEditorComponent implements AfterViewInit {
     }
 
     /** Set the handler for when a node is selected. Overwrites any existing handler. */
-    public setOnNodeSelected(func: (node: NodeDef) => void): void {
+    public setOnNodeSelected(func: (node: VisNode) => void): void {
         this._network.setSelectNodeHandler(params => {
             const n = this._network.getNode(params.nodes[0]);
             func(n);
         });
     }
 
-    public editNode(id: string | number, editFunc: (node: NodeDef) => void) {
+    public editNode(id: string | number, editFunc: (node: VisNode) => void) {
         const node = this._network.getNode(id);
         if (node !== undefined) {
             editFunc(node);
@@ -115,10 +143,10 @@ export class GraphEditorComponent implements AfterViewInit {
         const bounds = this._network.getCurrentViewBounds();
         const graph = randomSquareGraph(bounds.maxy, bounds.maxx, 30);
         let node_counter = 0;
-        const nodes = graph.get_nodes().map(n => new NodeDef(node_counter, node_counter++ + '', n.x, n.y));
+        const nodes = graph.get_nodes().map(n => new VisNode(node_counter, node_counter++ + '', n.x, n.y));
         // note that edge 'from' & 'to' refer to the position of the node in the node array
-        const edges = graph.get_edges().map(e => new EdgeDef(e.from, e.to));
-        this._network.setData(new NetworkDef(nodes, edges));
+        const edges = graph.get_edges().map(e => new VisEdge(e.from, e.to));
+        this._network.setData(new VisNetworkDef(nodes, edges));
         // setting new data exits edit mode, so get back in there
         this._network.addNodeMode();
     }
@@ -134,11 +162,11 @@ export class GraphEditorComponent implements AfterViewInit {
         });
     }
 
-    private loadGraphFromJson(graphJson: string): NetworkDef {
+    private loadGraphFromJson(graphJson: string): VisNetworkDef {
         const graphData = JSON.parse(graphJson);
-        const nodes = graphData.nodes.map(n => new NodeDef(n.id, n.label, n.x, n.y));
-        const edges = graphData.edges.map(e => new EdgeDef(e.from, e.to));
-        return new NetworkDef(nodes, edges);
+        const nodes = graphData.nodes.map(n => new VisNode(n.id, n.label, n.x, n.y));
+        const edges = graphData.edges.map(e => new VisEdge(e.from, e.to));
+        return new VisNetworkDef(nodes, edges);
     }
 
     @HostListener('document:keypress', ['$event'])

@@ -31,7 +31,7 @@ class GraphBase<T> {
         return node;
     }
 
-    public add_edge(p: number, q: number, weight: number): void {
+    public add_edge(p: number, q: number, weight: number = 1): void {
         this._graph.add_edge(p, q, weight);
     }
 

@@ -1,4 +1,5 @@
 import { DataSet, Network } from 'vis/index-network';
+import { Guid } from '../guid/guid';
 
 // Note: if using angular, add the following line to your
 // global styles (src/styles.css)
@@ -37,7 +38,7 @@ export class VisNetwork {
         this._network = new Network(container, data, options);
     }
 
-    public setData(data: NetworkDef): void {
+    public setData(data: VisNetworkDef): void {
         const nodes = new DataSet(data.nodes.map(n => this.toVisNode(n)));
         const edges = new DataSet(data.edges.map(e => this.toVisEdge(e)));
         this._network.setData({nodes: nodes, edges: edges});
@@ -45,10 +46,10 @@ export class VisNetwork {
         this._edges = edges;
     }
 
-    public toNetworkDef(): NetworkDef {
-        const nodes = this._nodes.map(n => new NodeDef(n.id, n.label, n.x, n.y));
-        const edges = this._edges.map(e => new EdgeDef(e.from, e.to));
-        return new NetworkDef(nodes, edges);
+    public toNetworkDef(): VisNetworkDef {
+        const nodes = this._nodes.map(n => new VisNode(n.id, n.label, n.x, n.y));
+        const edges = this._edges.map(e => new VisEdge(e.from, e.to));
+        return new VisNetworkDef(nodes, edges);
     }
 
     /** Add a node to the network at given coords */
@@ -72,6 +73,18 @@ export class VisNetwork {
             to: to
         });
         return id;
+    }
+
+    public nodeCount(): number {
+        return this._nodes.length;
+    }
+
+    public getNodes(): VisNode[] {
+        return this._nodes.map(n => new VisNode(n.id, n.label, n.x, n.y));
+    }
+
+    public getEdges(): VisEdge[] {
+        return this._edges.map(e => new VisEdge(e.from, e.to));
     }
 
     /** Returns an array of node ids */
@@ -124,11 +137,11 @@ export class VisNetwork {
         this._network.addEdgeMode();
     }
 
-    public getNode(id: string | number): NodeDef {
+    public getNode(id: string | number): VisNode {
         return this._nodes.get(id);
     }
 
-    public updateNode(node: NodeDef) {
+    public updateNode(node: VisNode) {
         this._nodes.update(node);
     }
 
@@ -147,11 +160,11 @@ export class VisNetwork {
     }
 
     /** Convert a node definition into a vis node */
-    private toVisNode(node_def: NodeDef): any {
+    private toVisNode(node_def: VisNode): any {
         return node_def;
     }
 
-    private toVisEdge(edge_def: EdgeDef): any {
+    private toVisEdge(edge_def: VisEdge): any {
         return edge_def;
     }
 
@@ -165,19 +178,19 @@ export class VisNetwork {
 }
 
 /** Definition of a network */
-export class NetworkDef {
+export class VisNetworkDef {
 
-    public nodes: NodeDef[];
-    public edges: EdgeDef[];
+    public nodes: VisNode[];
+    public edges: VisEdge[];
 
-    public constructor(nodes: NodeDef[] = null, edges: EdgeDef[] = null) {
+    public constructor(nodes: VisNode[] = null, edges: VisEdge[] = null) {
         this.nodes = nodes;
         this.edges = edges;
     }
 }
 
-/** Definition of a network node */
-export class NodeDef {
+/** Definition of a vis network node */
+export class VisNode {
     /** Unique node id */
     public id: string | number;
     /** Label to display on node */
@@ -196,15 +209,14 @@ export class NodeDef {
     }
 }
 
-/** Definition of a network edge */
-export class EdgeDef {
-    /** node id of the tail side of this edge */
-    public from: string | number;
-    /** node id of the head side of this edge */
-    public to: string | number;
-
-    public constructor(from: string | number, to: string | number) {
-        this.from = from;
-        this.to = to;
+/** Definition of a vis network edge */
+export class VisEdge {
+    public constructor(
+        /** node id of the tail side of this edge */
+        public from: string | number,
+        /** node id of the head side of this edge */
+        public to: string | number,
+        /** Unique edge id */
+        public id: string | number = Guid.newGuid()) {
     }
 }
