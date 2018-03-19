@@ -1,3 +1,16 @@
+<!-- toolbar -->
+<div class="editor-toolbar">
+  <button mat-button (click)="generateRandomGraph()">Random</button>
+  <button mat-button (click)="exportGraph()">Export</button>
+  <button mat-button (click)="clear()">Clear</button>
+  <mat-checkbox [checked]="isPhysicsEnabled"
+                (change)="isPhysicsEnabled = !isPhysicsEnabled">Physics enabled
+  </mat-checkbox>
+</div>
+
+<!-- editor -->
+<div #graphEditorDiv id="graphEditorDiv"></div>
+
 <!-- instructions -->
 <mat-expansion-panel>
   <mat-expansion-panel-header>
@@ -11,11 +24,3 @@
     <li>Double-click on nodes to edit them</li>
   </ul>
 </mat-expansion-panel>
-
-<div class="editor-toolbar">
-  <button mat-button (click)="generateRandomGraph()">Random</button>
-  <button mat-button (click)="exportGraph()">Export</button>
-  <button mat-button (click)="clear()">Clear</button>
-</div>
-
-<div #graphEditorDiv id="graphEditorDiv"></div>

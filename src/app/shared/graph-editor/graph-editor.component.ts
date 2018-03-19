@@ -21,6 +21,7 @@ export class GraphEditorComponent implements AfterViewInit {
 
     private _network: VisNetwork;
     private _isEditingNode: boolean;
+    private _isPhysicsEnabled = true;
 
     @ViewChild('graphEditorDiv') private _networkElem: ElementRef;
 
@@ -56,11 +57,6 @@ export class GraphEditorComponent implements AfterViewInit {
                 }
             }
         });
-
-        // HACK: I want physics disabled from the start, but
-        // if I do so, the canvas doesn't render properly. So,
-        // I turn it off here... meh
-        this._network.disablePhysics();
 
         this._network.setDoubleClickHandler(p => {
             if (p.nodes.length === 1) {
@@ -103,6 +99,15 @@ export class GraphEditorComponent implements AfterViewInit {
             editFunc(node);
             this._network.updateNode(node);
         }
+    }
+
+    public get isPhysicsEnabled(): boolean {
+        return this._isPhysicsEnabled;
+    }
+
+    public set isPhysicsEnabled(val: boolean) {
+        this._isPhysicsEnabled = val;
+        this._network.isPhysicsEnabled = val;
     }
 
     private generateRandomGraph() {

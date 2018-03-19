@@ -155,19 +155,12 @@ export class VisNetwork {
         return edge_def;
     }
 
-    /** Turns on forces between nodes, causing them to spread out
-        DOESN'T WORK
-    */
-    enablePhysics() {
-        this._network.startSimulation();
+    public get isPhysicsEnabled(): boolean {
+        return this._network.physics.enabled;
     }
 
-    /** Turn of physics simulation. Nodes won't move by themselves
-        DOESN'T WORK
-    */
-    disablePhysics() {
-        this._network.stopSimulation();
-        this._network.setOptions({physics: false});
+    public set isPhysicsEnabled(val: boolean) {
+        this._network.setOptions({physics: {enabled: val}});
     }
 }
 
