@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialogModule, MatInputModule, MatButtonModule, MatSidenavModule, MatExpansionModule,
-  MatCheckboxModule } from '@angular/material';
+  MatCheckboxModule, MatIconModule } from '@angular/material';
 
 import { AppRoutingModule } from './app-routing.module';
 
@@ -42,7 +42,8 @@ import { MstComponent } from './alg_views/graph_general/mst/mst.component';
     MatButtonModule,
     MatSidenavModule,
     MatExpansionModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatIconModule
   ],
   providers: [],
   bootstrap: [AppComponent],

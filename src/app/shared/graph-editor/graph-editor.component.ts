@@ -35,7 +35,8 @@ export class GraphEditorComponent implements AfterViewInit {
     public ngAfterViewInit(): void {
         const _ths = this;
         this._network = new VisNetwork(this._networkElem.nativeElement, {
-            height: '401px',
+            // todo: figure out how to fill remaining vertical space with canvas
+            height: '500px',
             locale: 'en',
             manipulation: {
                 addNode: function (data, callback) {
@@ -112,13 +113,14 @@ export class GraphEditorComponent implements AfterViewInit {
 
     private generateRandomGraph() {
         const bounds = this._network.getCurrentViewBounds();
-        console.log(bounds);
         const graph = randomSquareGraph(bounds.maxy, bounds.maxx, 30);
         let node_counter = 0;
         const nodes = graph.get_nodes().map(n => new NodeDef(node_counter, node_counter++ + '', n.x, n.y));
         // note that edge 'from' & 'to' refer to the position of the node in the node array
         const edges = graph.get_edges().map(e => new EdgeDef(e.from, e.to));
         this._network.setData(new NetworkDef(nodes, edges));
+        // setting new data exits edit mode, so get back in there
+        this._network.addNodeMode();
     }
 
     private openEditNodeDialog(node: EditNodeDialogData, onSubmit: (d: EditNodeDialogData) => void) {

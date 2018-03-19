@@ -22,7 +22,7 @@ export class MstComponent {
 
   private createGraphState = new AlgViewerState(
     StateType.CreatingGraph,
-    () => { this.instructions = 'Create a graph'; },
+    () => { this.instructions = 'Create, generate, or drag & drop a graph'; },
     input => this.createGraphState
   );
 }
