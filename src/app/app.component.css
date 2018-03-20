@@ -1,0 +1,19 @@
+#app-sidenav-container {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+}
+#app-sidenav-content-container {
+    display: flex;
+    flex-flow: row;
+    height: 100%;
+}
+#app-sidenav-mini {
+    flex: 0 1 56px;
+}
+#app-sidenav-main-content {
+    flex: 1 1 auto;
+}
+#btn-open-menu {
+    min-width: 10%;
+}

@@ -1,0 +1,1 @@
+This is a library of typescript wrapper classes around vis.js components.

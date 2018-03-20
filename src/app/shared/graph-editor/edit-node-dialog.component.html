@@ -1,0 +1,10 @@
+<div>
+  <h2>Edit node</h2>
+  <mat-form-field>
+    <input matInput [(ngModel)]="node.label" placeholder="label" cdkFocusInitial>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onCancelClick()">Cancel</button>
+  <button mat-button (click)="onOkClick()">OK</button>
+</div>

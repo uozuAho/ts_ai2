@@ -1,15 +1,27 @@
-<mat-sidenav-container class="example-container">
-    <mat-sidenav #sidenav mode="side">
-        <p><button mat-button (click)="sidenav.toggle()">close menu</button></p>
+<header id="app-header">TS AI</header>
+
+<mat-sidenav-container id="app-sidenav-container">
+    <mat-sidenav #sidenav mode="side" id="app-sidenav-side-container">
         <p><a routerLink="/search/astar">A* search</a></p>
         <p><a routerLink="/search/bfs">Breadth-first search</a></p>
         <p><a routerLink="/search/dfs">Depth-first search</a></p>
         <p><a routerLink="/search/greedy_bfs">Greedy best-first search</a></p>
         <p><a routerLink="/search/ids">Iterative deepening search</a></p>
+        <p><a routerLink="/graph_alg_viewer">Graph algorithm viewer</a></p>
+        <p><a routerLink="/graph_general/mst">MST</a></p>
     </mat-sidenav>
 
     <mat-sidenav-content>
-        <p><button mat-button (click)="sidenav.toggle()">menu</button></p>
-        <router-outlet></router-outlet>
+        <div id="app-sidenav-content-container">
+            <div id="app-sidenav-mini">
+                <button id="btn-open-menu" mat-button (click)="sidenav.toggle()">
+                    <mat-icon *ngIf="!sidenav.opened">chevron_right</mat-icon>
+                    <mat-icon *ngIf="sidenav.opened">chevron_left</mat-icon>
+                </button>
+            </div>
+            <div id="app-sidenav-main-content">
+                <router-outlet></router-outlet>
+            </div>
+        </div>
     </mat-sidenav-content>
 </mat-sidenav-container>

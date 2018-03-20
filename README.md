@@ -10,6 +10,8 @@ Currently migrating visualisations from https://github.com/uozuAho/ts_ai
 - ai_lib/ is a standalone 'ai' library
 - console_apps/ contains 'ai' console apps. These can be run by compiling
   the project to js (`npm run tsc` or `yarn tsc`), then running with nodejs
+- libs/ contains independent libraries for various things. These libs should
+  only depend on libraries included in package.json
 - everything else is part of the angular framework, which contains
   visualisations of some algorithms, and runs tests
 

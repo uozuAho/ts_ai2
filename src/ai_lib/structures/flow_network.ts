@@ -18,12 +18,13 @@ export class FlowNetwork {
      * @throws Error if {@code V < 0}
      */
     constructor (num_vertices: number) {
-        if (num_vertices < 0) throw new Error("Number of vertices in a Graph must be nonnegative");
+        if (num_vertices < 0) { throw new Error('Number of vertices in a Graph must be nonnegative'); }
         this._num_vertices = num_vertices;
         this._num_edges = 0;
         this._adj = [];
-        for (let v = 0; v < num_vertices; v++)
+        for (let v = 0; v < num_vertices; v++) {
             this._adj[v] = [];
+        }
     }
 
     /**
@@ -44,8 +45,9 @@ export class FlowNetwork {
 
     // throw an IllegalArgumentException unless {@code 0 <= v < V}
     private validateVertex(v: number): void {
-        if (v < 0 || v >= this._num_vertices)
-            throw new Error("vertex " + v + " is not between 0 and " + (this._num_vertices-1));
+        if (v < 0 || v >= this._num_vertices) {
+            throw new Error('vertex ' + v + ' is not between 0 and ' + (this._num_vertices - 1));
+        }
     }
 
     /**
@@ -55,8 +57,8 @@ export class FlowNetwork {
      *         {@code 0} and {@code V-1}
      */
     public add_edge(e: FlowEdge): void {
-        let v = e.from();
-        let w = e.to();
+        const v = e.from();
+        const w = e.to();
         this.validateVertex(v);
         this.validateVertex(w);
         this._adj[v].push(e);
@@ -78,11 +80,12 @@ export class FlowNetwork {
 
     // return list of all edges - excludes self loops
     public edges(): FlowEdge[] {
-        let list: FlowEdge[] = [];
+        const list: FlowEdge[] = [];
         for (let v = 0; v < this._num_vertices; v++) {
             for (const e of this._adj[v]) {
-                if (e.to() != v)
+                if (e.to() !== v) {
                     list.push(e);
+                }
             }
         }
         return list;
@@ -105,9 +108,9 @@ export class FlowEdge {
      * @throws Error if capacity < 0.0
      */
     constructor(from: number, to: number, capacity: number, flow: number = 0) {
-        if (from < 0) throw new Error("vertex index must be a non-negative integer");
-        if (to < 0) throw new Error("vertex index must be a non-negative integer");
-        if (!(capacity >= 0.0)) throw new Error("Edge capacity must be non-negative");
+        if (from < 0) { throw new Error('vertex index must be a non-negative integer'); }
+        if (to < 0) { throw new Error('vertex index must be a non-negative integer'); }
+        if (!(capacity >= 0.0)) { throw new Error('Edge capacity must be non-negative'); }
         this._from         = from;
         this._to         = to;
         this._capacity  = capacity;
@@ -164,9 +167,11 @@ export class FlowEdge {
      *   of the edge
      */
     public other(vertex: number): number {
-        if      (vertex == this._from) return this._to;
-        else if (vertex == this._to) return this._from;
-        else throw new Error("invalid endpoint");
+        if (vertex === this._from) {
+            return this._to;
+        } else if (vertex === this._to) {
+            return this._from;
+        } else { throw new Error('invalid endpoint'); }
     }
 
     /**
@@ -180,9 +185,11 @@ export class FlowEdge {
      * @throws Error if vertex is not one of the endpoints of the edge
      */
     public residual_capacity_to(vertex: number): number {
-        if      (vertex == this._from) return this._flow;              // backward edge
-        else if (vertex == this._to) return this._capacity - this._flow;   // forward edge
-        else throw new Error("invalid endpoint");
+        if (vertex === this._from) {
+            return this._flow;
+        } else if (vertex === this._to) {
+            return this._capacity - this._flow;
+        } else { throw new Error('invalid endpoint'); }
     }
 
     /**
@@ -198,20 +205,24 @@ export class FlowEdge {
      * @throws Error if delta is NaN
      */
     public add_residual_flow_to(vertex: number, delta: number): void {
-        if (!(delta >= 0.0)) throw new Error("Delta must be nonnegative");
+        if (!(delta >= 0.0)) { throw new Error('Delta must be nonnegative'); }
 
-        if      (vertex == this._from) this._flow -= delta;           // backward edge
-        else if (vertex == this._to) this._flow += delta;           // forward edge
-        else throw new Error("invalid endpoint");
+        if (vertex === this._from) {
+            this._flow -= delta;
+         } else if (vertex === this._to) {
+             this._flow += delta;
+        } else { throw new Error('invalid endpoint'); }
 
         // round flow to 0 or capacity if within floating-point precision
-        if (Math.abs(this._flow) <= FlowEdge.FLOATING_POINT_EPSILON)
+        if (Math.abs(this._flow) <= FlowEdge.FLOATING_POINT_EPSILON) {
             this._flow = 0;
-        if (Math.abs(this._flow - this._capacity) <= FlowEdge.FLOATING_POINT_EPSILON)
+        }
+        if (Math.abs(this._flow - this._capacity) <= FlowEdge.FLOATING_POINT_EPSILON) {
             this._flow = this._capacity;
+        }
 
-        if (!(this._flow >= 0.0))      throw new Error("Flow is negative");
-        if (!(this._flow <= this._capacity)) throw new Error("Flow exceeds capacity");
+        if (!(this._flow >= 0.0)) {      throw new Error('Flow is negative'); }
+        if (!(this._flow <= this._capacity)) { throw new Error('Flow exceeds capacity'); }
     }
 
     /**
@@ -219,6 +230,6 @@ export class FlowEdge {
      * @return a string representation of the edge
      */
     public toString(): string {
-        return this._from + "->" + this._to + " " + this._flow + "/" + this._capacity;
+        return this._from + '->' + this._to + ' ' + this._flow + '/' + this._capacity;
     }
 }

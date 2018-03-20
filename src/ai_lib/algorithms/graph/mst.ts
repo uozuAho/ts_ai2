@@ -2,11 +2,11 @@ import { UnionFind } from './union_find';
 import { Edge, IGraph } from '../../structures/igraph';
 import { Graph } from '../../structures/graph';
 
-/** Finds a minimum spanning tree (MST) (or forest) for graphs */
+/** Finds a minimum spanning tree (MST) (or forest) for undirected graphs */
 export class Mst implements IGraph {
 
-    _edges: Edge[];
-    _graph: IGraph;
+    private _edges: Edge[];
+    private _graph: IGraph;
 
     private static _to_graph(num_nodes: number, edges: Edge[]) {
         const graph = new Graph(num_nodes);

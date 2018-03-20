@@ -6,7 +6,8 @@ import { BreadthFirstSearchComponent } from './alg_views/search/breadth-first-se
 import { DepthFirstSearchComponent } from './alg_views/search/depth-first-search/depth-first-search.component';
 import { GreedyBestFirstSearchComponent } from './alg_views/search/greedy-best-first-search/greedy-best-first-search.component';
 import { IterativeDeepeningComponent } from './alg_views/search/iterative-deepening/iterative-deepening.component';
-
+import { GraphAlgViewerComponent } from './graph-alg-viewer/graph-alg-viewer.component';
+import { MstComponent } from './alg_views/graph_general/mst/mst.component';
 
 const routes: Routes = [
   { path: 'search/astar', component: AstarComponent },
@@ -14,6 +15,8 @@ const routes: Routes = [
   { path: 'search/dfs', component: DepthFirstSearchComponent },
   { path: 'search/greedy_bfs', component: GreedyBestFirstSearchComponent },
   { path: 'search/ids', component: IterativeDeepeningComponent },
+  { path: 'graph_alg_viewer', component: GraphAlgViewerComponent },
+  { path: 'graph_general/mst', component: MstComponent },
 ];
 
 @NgModule({
