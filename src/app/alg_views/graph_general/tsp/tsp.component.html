@@ -1,0 +1,14 @@
+<h1>TSP</h1>
+<div id="box-container">
+  <div id="box-steps">
+    <div style="display: flex; flex-flow: row;">
+      <p>{{instructions}}</p>
+      <button mat-button (click)="back()">{{backButtonText}}</button>
+      <button mat-button (click)="next()">{{nextButtonText}}</button>
+      <button mat-button (click)="reset()">Reset</button>
+    </div>
+  </div>
+  <div id="box-editor">
+    <app-graph-editor></app-graph-editor>
+  </div>
+</div>

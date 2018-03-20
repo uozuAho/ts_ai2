@@ -67,10 +67,6 @@ export class GraphEditorComponent implements AfterViewInit {
             }
         });
 
-        this._network.setClickHandler(p => {
-            console.log(p);
-        });
-
         this._network.setDoubleClickHandler(p => {
             if (p.nodes.length === 1) {
                 this._network.editNodeMode();
@@ -165,6 +161,18 @@ export class GraphEditorComponent implements AfterViewInit {
 
     public redraw() {
         this._network.redraw();
+    }
+
+    public deleteEdge(id: string | number) {
+        this._network.deleteEdge(id);
+    }
+
+    public deleteEdges() {
+        this._network.deleteEdges();
+    }
+
+    public addEdge(edge: VisEdge) {
+        this._network.addEdge(edge);
     }
 
     private generateRandomGraph() {

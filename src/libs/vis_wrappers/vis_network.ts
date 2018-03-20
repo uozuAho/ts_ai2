@@ -65,13 +65,14 @@ export class VisNetwork {
     }
 
     /** Add edge between specified node ids */
-    public addEdge(from: string | number, to: string | number) {
-        const id = this._nextEdgeId++;
-        this._edges.add({
-            id: id,
-            from: from,
-            to: to
+    public addEdge(edge: VisEdge): string | number {
+        const ids = this._edges.add({
+            id: edge.id,
+            from: edge.from,
+            to: edge.to
         });
+        const id = ids[0];
+        edge.id = id;
         return id;
     }
 
@@ -165,6 +166,14 @@ export class VisNetwork {
             maxx: frame.clientLeft + frame.clientWidth,
             maxy: frame.clientTop + frame.clientHeight
         };
+    }
+
+    public deleteEdge(id: string | number) {
+        this._edges.remove(id);
+    }
+
+    public deleteEdges() {
+        this._edges.clear();
     }
 
     /** Convert a node definition into a vis node */
