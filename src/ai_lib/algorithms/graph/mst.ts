@@ -2,7 +2,7 @@ import { UnionFind } from './union_find';
 import { Edge, IGraph } from '../../structures/igraph';
 import { Graph } from '../../structures/graph';
 
-/** Finds a minimum spanning tree (MST) (or forest) for graphs */
+/** Finds a minimum spanning tree (MST) (or forest) for undirected graphs */
 export class Mst implements IGraph {
 
     private _edges: Edge[];
