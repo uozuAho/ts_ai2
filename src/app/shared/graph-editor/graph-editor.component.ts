@@ -40,6 +40,12 @@ export class GraphEditorComponent implements AfterViewInit {
             // todo: figure out how to fill remaining vertical space with canvas
             height: '500px',
             locale: 'en',
+            edges: {
+                smooth: false,
+                color: {
+                    inherit: false
+                }
+            },
             manipulation: {
                 addNode: function (data, callback) {
                     callback(data);
@@ -79,15 +85,25 @@ export class GraphEditorComponent implements AfterViewInit {
         return this._network.toNetworkDef();
     }
 
+    public getNodes(): VisNode[] {
+        return this._network.getNodes();
+    }
+
+    public getEdges(): VisEdge[] {
+        return this._network.getEdges();
+    }
+
     /** Get an IGraph representation of the current graph */
     public getGraph(): GraphT<VisNode> {
         const nodes = this._network.getNodes();
         // map node id --> array idx
         const nodeIdxMap = new Map<string | number, number>();
-        for (let i = 0, node = nodes[i]; i < nodes.length; i++) {
-            nodeIdxMap.set(node.id, i);
-        }
         const graph = new GraphT<VisNode>();
+        for (let i = 0; i < nodes.length; i++) {
+            const node = nodes[i];
+            nodeIdxMap.set(node.id, i);
+            graph.add_node(node);
+        }
         for (const edge of this._network.getEdges()) {
             const fromIdx = nodeIdxMap.get(edge.from);
             const toIdx = nodeIdxMap.get(edge.to);
@@ -130,6 +146,14 @@ export class GraphEditorComponent implements AfterViewInit {
         }
     }
 
+    public editEdge(id: string | number, editFunc: (edge: VisEdge) => void) {
+        const edge = this._network.getEdge(id);
+        if (edge !== undefined) {
+            editFunc(edge);
+            this._network.updateEdge(edge);
+        }
+    }
+
     public get isPhysicsEnabled(): boolean {
         return this._isPhysicsEnabled;
     }
@@ -137,6 +161,10 @@ export class GraphEditorComponent implements AfterViewInit {
     public set isPhysicsEnabled(val: boolean) {
         this._isPhysicsEnabled = val;
         this._network.isPhysicsEnabled = val;
+    }
+
+    public redraw() {
+        this._network.redraw();
     }
 
     private generateRandomGraph() {

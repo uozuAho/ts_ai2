@@ -84,7 +84,7 @@ export class VisNetwork {
     }
 
     public getEdges(): VisEdge[] {
-        return this._edges.map(e => new VisEdge(e.from, e.to));
+        return this._edges.map(e => new VisEdge(e.from, e.to, e.id));
     }
 
     /** Returns an array of node ids */
@@ -141,8 +141,16 @@ export class VisNetwork {
         return this._nodes.get(id);
     }
 
+    public getEdge(id: string | number): VisEdge {
+        return this._edges.get(id);
+    }
+
     public updateNode(node: VisNode) {
         this._nodes.update(node);
+    }
+
+    public updateEdge(edge: VisEdge) {
+        this._edges.update(edge);
     }
 
     public selectNodes(ids: any[]) {
@@ -211,6 +219,10 @@ export class VisNode {
 
 /** Definition of a vis network edge */
 export class VisEdge {
+
+    public color: VisEdgeColor;
+    public width: number;
+
     public constructor(
         /** node id of the tail side of this edge */
         public from: string | number,
@@ -219,4 +231,13 @@ export class VisEdge {
         /** Unique edge id */
         public id: string | number = Guid.newGuid()) {
     }
+}
+
+export class VisEdgeColor {
+    public color: string;
+    public highlight: string;
+    public hover: string;
+    public inherit: string | boolean;
+    public opacity: number;
+    public dashes: Array<number> | boolean;
 }

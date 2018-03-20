@@ -9,14 +9,7 @@ export interface IGraph {
 }
 
 export class Edge {
-    public from: number;
-    public to: number;
-    public weight: number;
-    constructor(from: number, to: number, weight: number) {
-        this.from = from;
-        this.to = to;
-        this.weight = weight;
-    }
+    constructor(public from: number, public to: number, public weight: number) {}
 
     /** Compares weights. -1 if this is less than other, 0 if same, else 1 */
     public compare(other: Edge) {

@@ -8,7 +8,7 @@ describe('DiGraphOfPoint2d', function() {
         graph = new DiGraphT<Point2d>();
     });
 
-    it('getAdjacent', function() {
+    it('getAdjacent should depend on edge direction', function() {
         const node1 = graph.add_node(new Point2d(1, 1));
         const node2 = graph.add_node(new Point2d(2, 2));
         graph.add_edgeT(node1, node2, 1);
@@ -44,7 +44,7 @@ describe('GraphOfPoint2d', function() {
         graph = new GraphT<Point2d>();
     });
 
-    it('getAdjacent', function() {
+    it('single edge should make both nodes adjacent to each other', function() {
         const node1 = graph.add_node(new Point2d(1, 1));
         const node2 = graph.add_node(new Point2d(2, 2));
         graph.add_edgeT(node1, node2, 1);

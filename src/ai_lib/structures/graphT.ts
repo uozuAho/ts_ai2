@@ -122,14 +122,7 @@ export class DiGraphT<T> extends GraphBase<T> implements IGraph {
 
 /** Edge with typed nodes */
 export class EdgeT<T> {
-    public from: T;
-    public to: T;
-    public cost: number;
-    constructor(from: T, to: T, cost: number) {
-        this.from = from;
-        this.to = to;
-        this.cost = cost;
-    }
+    constructor(public from: T, public to: T, public cost: number) {}
 }
 
 /** Creates an undirected randomly weighted graph with nodes randomly distributed within the 2d
