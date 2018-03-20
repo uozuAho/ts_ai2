@@ -1,15 +1,12 @@
 # TSP todo
 
-1. ~~Construct a graph G whose vertices are the N cities with an edge between every pair of
-cities A != B with corresponding weight d(A, B), where d(A, B) is the distance between
-A and B in the plane.~~
+1. Create a graph G
 
-2. ~~Compute an MST T of G (Recall that a minimum spanning tree (MST) of a graph G
-is a spanning tree whose sum of edge weights is as small as possible).~~
+2. Compute an MST T of G
 
-3. ~~Compute, for each city A ∈ G, the degree d A of A in T .~~
+3. Compute, for each city A ∈ G, the degree d(A) of A in T
 
-4. ~~Let S = {A ∈ G : d A is odd}.~~
+4. Let S = {A ∈ G : d(A) is odd}
 
 5. Compute a minimum weight perfect matching M on the vertices in S (using the dis­
 tances d(·, · ) as weights).

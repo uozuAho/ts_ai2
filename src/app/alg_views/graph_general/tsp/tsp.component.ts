@@ -1,8 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
 import { GraphEditorComponent } from '../../../shared/graph-editor/graph-editor.component';
-import { VisEdge } from '../../../../libs/vis_wrappers/vis_network';
-import { Graph } from '../../../../ai_lib/structures/graph';
+import { VisEdge, VisNode } from '../../../../libs/vis_wrappers/vis_network';
+import { GraphT } from '../../../../ai_lib/structures/graphT';
 import { Mst } from '../../../../ai_lib/algorithms/graph/mst';
+import { IGraph } from '../../../../ai_lib/structures/igraph';
+import { Graph } from '../../../../ai_lib/structures/graph';
 
 @Component({
   selector: 'app-tsp',
@@ -11,10 +13,13 @@ import { Mst } from '../../../../ai_lib/algorithms/graph/mst';
 })
 export class TspComponent {
 
-  private instructions: string;
+  private currentStepText: string;
   private backButtonText = 'Back';
   private nextButtonText = 'Done';
+
   private _currentState: AlgViewerState;
+  private _originalGraph: GraphT<VisNode>;
+  private _mst: IGraph;
 
   @ViewChild(GraphEditorComponent) private _graphEditor: GraphEditorComponent;
 
@@ -40,23 +45,24 @@ export class TspComponent {
   }
 
   private createGraphState = new AlgViewerState(
-    StateType.CreatingGraph,
     () => {
-      this.instructions = 'Create a map of cities. Don\'t worry about edges, they\'ll be generated';
-      this.nextButtonText = 'Done';
+      this.currentStepText = 'Create a map of cities. Don\'t worry about edges, they\'ll be generated';
+      this.nextButtonText = 'Next';
     },
     input => {
       switch (input) {
-        case StateInput.Next: return this.joinNodesState;
+        case StateInput.Next: {
+          this._originalGraph = this._graphEditor.getGraph();
+          return this.getMstState;
+        }
         default: return this._currentState;
       }
     }
   );
 
-  private joinNodesState = new AlgViewerState(
-    StateType.JoinNodes,
+  private getMstState = new AlgViewerState(
     () => {
-      this.instructions = 'Get MST of fully connected cities graph';
+      this.currentStepText = 'Get MST of fully connected cities graph';
       this.nextButtonText = 'Next';
 
       // find mst of fully connected nodes
@@ -70,11 +76,11 @@ export class TspComponent {
           graph.add_edge(i, j, dist2);
         }
       }
-      const mst = new Mst(graph);
+      this._mst = new Mst(graph);
 
       // delete any existing edges, populate MST edges
       this._graphEditor.deleteEdges();
-      for (const edge of mst.get_edges()) {
+      for (const edge of this._mst.get_edges()) {
         const nodeFrom = nodes[edge.from];
         const nodeTo = nodes[edge.to];
         this._graphEditor.addEdge(new VisEdge(nodeFrom.id, nodeTo.id));
@@ -83,6 +89,26 @@ export class TspComponent {
     input => {
       switch (input) {
         case StateInput.Back: return this.createGraphState;
+        case StateInput.Next: return this.getOddDegreeMstNodes;
+        default: return this._currentState;
+      }
+    }
+  );
+
+  private getOddDegreeMstNodes = new AlgViewerState(
+    () => {
+      this.currentStepText = 'Find cities with odd degree in MST';
+      const nodes = this._originalGraph.get_nodes();
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        if (this._mst.degree(i) % 2 === 1) {
+          this._graphEditor.editNode(node.id, n => n.color = 'red');
+        }
+      }
+    },
+    input => {
+      switch (input) {
+        case StateInput.Back: return this.getMstState;
         case StateInput.Next: return this.tempEndState;
         default: return this._currentState;
       }
@@ -90,19 +116,12 @@ export class TspComponent {
   );
 
   private tempEndState = new AlgViewerState(
-    StateType.TempEnd,
     () => {
-      this.instructions = 'Not yet implemented :)';
+      this.currentStepText = 'Not yet implemented :)';
       this.nextButtonText = 'N/A';
     },
     input => this.tempEndState
   );
-}
-
-enum StateType {
-  CreatingGraph,
-  JoinNodes,
-  TempEnd
 }
 
 enum StateInput {
@@ -112,7 +131,6 @@ enum StateInput {
 
 class AlgViewerState {
   constructor(
-    public state: StateType,
     public run: (() => void),
     public next: ((input: StateInput) => AlgViewerState)) {
   }
