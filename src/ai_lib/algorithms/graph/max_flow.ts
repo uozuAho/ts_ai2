@@ -39,7 +39,7 @@ export class MaxFlow {
      * @throws Error if initial flow is infeasible
      */
     public constructor(network: FlowNetwork, source: number, sink: number) {
-        this._num_vertices = network.num_vertices();
+        this._num_vertices = network.num_nodes();
         this.validate(source);
         this.validate(sink);
         if (source === sink) {
@@ -154,7 +154,7 @@ export class MaxFlow {
 
     private is_feasible(G: FlowNetwork, s: number, t: number): boolean {
         // check that capacity constraints are satisfied
-        for (let v = 0; v < G.num_vertices(); v++) {
+        for (let v = 0; v < G.num_nodes(); v++) {
             for (const e of G.incident(v)) {
                 if (e.flow() < -MaxFlow.FLOATING_POINT_EPSILON || e.flow() > e.capacity() + MaxFlow.FLOATING_POINT_EPSILON) {
                     return false;
@@ -169,7 +169,7 @@ export class MaxFlow {
         if (Math.abs(this._value - this.excess(G, t)) > MaxFlow.FLOATING_POINT_EPSILON) {
             return false;
         }
-        for (let v = 0; v < G.num_vertices(); v++) {
+        for (let v = 0; v < G.num_nodes(); v++) {
             if (v === s || v === t) { continue; } else if (Math.abs(this.excess(G, v)) > MaxFlow.FLOATING_POINT_EPSILON) {
                 return false;
             }
@@ -193,7 +193,7 @@ export class MaxFlow {
 
         // check that value of min cut = value of max flow
         let mincutValue = 0.0;
-        for (let v = 0; v < G.num_vertices(); v++) {
+        for (let v = 0; v < G.num_nodes(); v++) {
             for (const e of G.incident(v)) {
                 if ((v === e.from()) && this.is_in_cut(e.from()) && !this.is_in_cut(e.to())) {
                     mincutValue += e.capacity();

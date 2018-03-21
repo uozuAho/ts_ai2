@@ -1,3 +1,5 @@
+import { IGraph, Edge } from './igraph';
+
 /*
  *  see <a href="https://algs4.cs.princeton.edu/64maxflow">Section 6.4</a> of
  *  <i>Algorithms, 4th Edition</i> by Robert Sedgewick and Kevin Wayne.
@@ -5,7 +7,7 @@
  *  @author Robert Sedgewick
  *  @author Kevin Wayne
  */
-export class FlowNetwork {
+export class FlowNetwork implements IGraph {
 
     private readonly _num_vertices: number;
     private _num_edges: number;
@@ -27,11 +29,7 @@ export class FlowNetwork {
         }
     }
 
-    /**
-     * Returns the number of vertices in the edge-weighted graph.
-     * @return the number of vertices in the edge-weighted graph
-     */
-    public num_vertices(): number {
+    public num_nodes(): number {
         return this._num_vertices;
     }
 
@@ -51,12 +49,9 @@ export class FlowNetwork {
     }
 
     /**
-     * Adds the edge {@code e} to the network.
-     * @param e the edge
-     * @throws unless endpoints of edge are between
-     *         {@code 0} and {@code V-1}
+     * Add a flow edge to the network.
      */
-    public add_edge(e: FlowEdge): void {
+    public add_flow_edge(e: FlowEdge): void {
         const v = e.from();
         const w = e.to();
         this.validateVertex(v);
@@ -64,6 +59,13 @@ export class FlowNetwork {
         this._adj[v].push(e);
         this._adj[w].push(e);
         this._num_edges++;
+    }
+
+    /** Adds a flow edge to the network via the IGraph interface.
+     *  Use add_flow_edge for better control over flow edges.
+     */
+    public add_edge(p: number, q: number, weight: number): void {
+        this.add_flow_edge(new FlowEdge(p, q, weight));
     }
 
     /**
@@ -78,7 +80,7 @@ export class FlowNetwork {
         return this._adj[v];
     }
 
-    // return list of all edges - excludes self loops
+    /** return list of all edges - excludes self loops */
     public edges(): FlowEdge[] {
         const list: FlowEdge[] = [];
         for (let v = 0; v < this._num_vertices; v++) {
@@ -89,6 +91,20 @@ export class FlowNetwork {
             }
         }
         return list;
+    }
+
+    /** Get IGraph-style edges. Edge weights are network edge flows. */
+    public get_edges(): Edge[] {
+        return this.edges().map(e => new Edge(e.from(), e.to(), e.flow()));
+    }
+
+    /** Get IGraph-style adjacent edges. Edge weights are network edge flows. */
+    public adjacent(n: number): Edge[] {
+        return this._adj[n].map(e => new Edge(e.from(), e.to(), e.flow()));
+    }
+
+    public degree(n: number): number {
+        return this._adj[n].length;
     }
 }
 
