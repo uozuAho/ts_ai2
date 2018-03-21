@@ -5,6 +5,7 @@ import { GraphT } from '../../../../ai_lib/structures/graphT';
 import { Mst } from '../../../../ai_lib/algorithms/graph/mst';
 import { IGraph } from '../../../../ai_lib/structures/igraph';
 import { Graph } from '../../../../ai_lib/structures/graph';
+import { FlowNetwork, FlowEdge } from '../../../../ai_lib/structures/flow_network';
 
 @Component({
   selector: 'app-tsp',
@@ -20,6 +21,7 @@ export class TspComponent {
   private _currentState: AlgViewerState;
   private _originalGraph: GraphT<VisNode>;
   private _mst: IGraph;
+  private _mstOddDGraph: GraphT<VisNode>;
 
   @ViewChild(GraphEditorComponent) private _graphEditor: GraphEditorComponent;
 
@@ -99,16 +101,60 @@ export class TspComponent {
     () => {
       this.currentStepText = 'Find cities with odd degree in MST';
       const nodes = this._originalGraph.get_nodes();
+      this._mstOddDGraph = new GraphT<VisNode>();
       for (let i = 0; i < nodes.length; i++) {
         const node = nodes[i];
         if (this._mst.degree(i) % 2 === 1) {
+          this._mstOddDGraph.add_node(node);
           this._graphEditor.editNode(node.id, n => n.color = 'red');
+        }
+      }
+      // connect all nodes in new graph
+      const oddNodes = this._mstOddDGraph.get_nodes();
+      for (let i = 0; i < oddNodes.length - 1; i++) {
+        for (let j = i + 1; j < oddNodes.length; j++) {
+          this._mstOddDGraph.add_edge(i, j);
         }
       }
     },
     input => {
       switch (input) {
         case StateInput.Back: return this.getMstState;
+        case StateInput.Next: return this.hungarianState;
+        default: return this._currentState;
+      }
+    }
+  );
+
+  private hungarianState = new AlgViewerState(
+    () => {
+      this.currentStepText = 'Hungarian algorithm';
+      // for each node, subtract min edge weight from all edges
+      const nodes = this._mstOddDGraph.get_nodes();
+      for (let i = 0; i < nodes.length; i++) {
+        const adj = this._mstOddDGraph.adjacent(i);
+        const minWeight = Math.min(...adj.map(e => e.weight));
+        if (minWeight > 0) {
+          for (const a of adj) {
+            a.weight -= minWeight;
+          }
+        }
+      }
+      // get maximum matching using 0-weight edges
+      const flownet = new FlowNetwork(this._mstOddDGraph.num_nodes() + 2);
+      const flowSourceIdx = this._mstOddDGraph.num_nodes();
+      const flowSinkIdx = flowSourceIdx + 1;
+      // add zero weight edges
+      for (const e of this._mstOddDGraph.get_edges()) {
+        if (e.weight === 0) {
+          flownet.add_edge(new FlowEdge(e.from, e.to, 1));
+        }
+      }
+      // TODO: check if graph is bipartite, separate nodes into sets X, Y, connect source to X, sink to Y
+    },
+    input => {
+      switch (input) {
+        case StateInput.Back: return this.getOddDegreeMstNodes;
         case StateInput.Next: return this.tempEndState;
         default: return this._currentState;
       }
