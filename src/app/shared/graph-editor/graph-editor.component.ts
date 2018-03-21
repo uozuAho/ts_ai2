@@ -108,6 +108,10 @@ export class GraphEditorComponent implements AfterViewInit {
         return graph;
     }
 
+    public setGraph(graph: VisNetworkDef) {
+        this._network.setData(graph);
+    }
+
     /** Export the current graph to a file (auto browser download) */
     public exportGraphToFile(): void {
         const graph = this.getVisNetworkDef();

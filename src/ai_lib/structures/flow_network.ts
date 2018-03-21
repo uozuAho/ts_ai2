@@ -57,7 +57,7 @@ export class FlowNetwork implements IGraph {
         this.validateVertex(v);
         this.validateVertex(w);
         this._adj[v].push(e);
-        this._adj[w].push(e);
+        this._adj[w].push(new FlowEdge(e.to(), e.flow(), e.capacity(), e.flow()));
         this._num_edges++;
     }
 
