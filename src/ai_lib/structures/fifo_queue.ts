@@ -23,12 +23,16 @@ export class FifoQueue<T> {
     public isEmpty(): boolean {
         return this.start == null;
     }
+
+    public* items(): IterableIterator<T> {
+        let current = this.start;
+        while (current !== null) {
+            yield current.data;
+            current = current.next;
+        }
+    }
 }
 
 class QueueItem<T> {
-    public data: T;
-    public next: QueueItem<T>;
-    constructor(thing: T) {
-        this.data = thing;
-    }
+    constructor(public data: T, public next: QueueItem<T> = null) {}
 }
