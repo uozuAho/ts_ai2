@@ -1,6 +1,7 @@
 import { IGraph, Edge } from './igraph';
 
-/*
+/*  A directed flow network.
+ *
  *  see <a href="https://algs4.cs.princeton.edu/64maxflow">Section 6.4</a> of
  *  <i>Algorithms, 4th Edition</i> by Robert Sedgewick and Kevin Wayne.
  *
