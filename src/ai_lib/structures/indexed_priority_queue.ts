@@ -42,13 +42,13 @@ export class IndexedPriorityQueue<T> {
     private _compare: (a: T, b: T) => number;
 
     /**
-     * Initializes an empty indexed priority queue with indices between {@code 0}
-     * and {@code maxN - 1}.
-     * @param  maxN the keys on this priority queue are index from {@code 0}
-     *         {@code maxN - 1}
-     * @throws IllegalArgumentException if {@code maxN < 0}
+     * Initializes an empty indexed priority queue with indices between 0 and maxN - 1.
+     * @param maxN the keys on this priority queue are index from 0, maxN - 1
+     * @param compare optional compare operator. If not supplied, default compare
+     * is used (assumes T understands greater/less than operators), and queue becomes
+     * min-priority.
      */
-    constructor(maxN: number, compare: (a: T, b: T) => number) {
+    constructor(maxN: number, compare: (a: T, b: T) => number = null) {
         if (maxN < 0) {
             throw new Error();
         }
@@ -60,7 +60,7 @@ export class IndexedPriorityQueue<T> {
         for (let i = 0; i <= maxN; i++) {
             this.qp[i] = -1;
         }
-        this._compare = compare;
+        this._compare = compare || this.defaultCompare;
     }
 
     /**
@@ -239,6 +239,10 @@ export class IndexedPriorityQueue<T> {
         this.sink(index);
         this.keys[i] = null;
         this.qp[i] = -1;
+    }
+
+    private defaultCompare(a: T, b: T): number {
+        return a < b ? -1 : a > b ? 1 : 0;
     }
 
     private throwIfInvalidIndex(i: number) {

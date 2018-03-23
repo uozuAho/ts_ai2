@@ -2,7 +2,7 @@ import { IndexedPriorityQueue } from './indexed_priority_queue';
 
 describe('IndexedPriorityQueue', function() {
     it('simple order', function() {
-        const q = new IndexedPriorityQueue<string>(5, (a, b) => a < b ? -1 : a > b ? 1 : 0);
+        const q = new IndexedPriorityQueue<string>(5);
         q.insert(0, 'a');
         q.insert(1, 'b');
         q.insert(2, 'c');
@@ -21,7 +21,7 @@ describe('IndexedPriorityQueue', function() {
     });
 
     it('different order', function() {
-        const q = new IndexedPriorityQueue<string>(5, (a, b) => a < b ? -1 : a > b ? 1 : 0);
+        const q = new IndexedPriorityQueue<string>(5);
         q.insert(0, 'c');
         q.insert(1, 'b');
         q.insert(2, 'a');
