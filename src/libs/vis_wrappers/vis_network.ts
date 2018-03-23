@@ -66,11 +66,7 @@ export class VisNetwork {
 
     /** Add edge between specified node ids */
     public addEdge(edge: VisEdge): string | number {
-        const ids = this._edges.add({
-            id: edge.id,
-            from: edge.from,
-            to: edge.to
-        });
+        const ids = this._edges.add(edge);
         const id = ids[0];
         edge.id = id;
         return id;
