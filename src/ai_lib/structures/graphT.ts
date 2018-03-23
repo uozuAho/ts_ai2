@@ -14,6 +14,10 @@ class GraphBase<T> {
         return this._graph.num_nodes();
     }
 
+    public num_edges(): number {
+        return this._graph.num_edges();
+    }
+
     public get_edges(): Edge[] {
         return this._graph.get_edges();
     }

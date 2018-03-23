@@ -44,6 +44,10 @@ export class Mst implements IGraph {
         return this._graph.num_nodes();
     }
 
+    public num_edges(): number {
+        return this._graph.num_edges();
+    }
+
     public add_edge(p: number, q: number, weight: number): void {
         this._graph.add_edge(p, q, weight);
     }

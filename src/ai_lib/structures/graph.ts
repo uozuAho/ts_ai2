@@ -1,25 +1,33 @@
 import { Edge, IGraph } from './igraph';
+import { Assert } from '../../libs/assert/Assert';
 
 /** Weighted graph, uses numbers to represent nodes */
 abstract class GraphBase {
 
     /** Number of nodes */
-    protected _n: number;
+    protected _num_nodes: number;
+
+    protected _num_edges: number;
 
     /** adjacency list */
     protected _adj: Edge[][];
 
     constructor(n: number = 0) {
-        this._n = n;
+        this._num_nodes = n;
+        this._num_edges = 0;
         this._adj = [];
     }
 
     public num_nodes(): number {
-        return this._n;
+        return this._num_nodes;
+    }
+
+    public num_edges(): number {
+        return this._num_edges;
     }
 
     public set_num_nodes(n: number): void {
-        this._n = n;
+        this._num_nodes = n;
     }
 
     /** Get edges incident to the given node */
@@ -46,7 +54,7 @@ abstract class GraphBase {
     }
 
     protected validate_idx(n: number): void {
-        if (n < 0 || n >= this._n) { throw new Error('invalid index: ' + n); }
+        if (n < 0 || n >= this._num_nodes) { throw new Error('invalid index: ' + n); }
     }
 }
 
@@ -58,6 +66,7 @@ export class Graph extends GraphBase implements IGraph {
         this.add_directed_edge(p, q, weight);
         // add the return edge. Don't duplicate this yourself!!
         this.add_directed_edge(q, p, weight);
+        this._num_edges++;
     }
 
     /** Return all undirected edges.
@@ -65,7 +74,7 @@ export class Graph extends GraphBase implements IGraph {
      */
     public get_edges(): Edge[] {
         const edges: Edge[] = [];
-        for (let v = 0; v < this._n; v++) {
+        for (let v = 0; v < this._num_nodes; v++) {
             let self_loop = 0;
             for (const edge of this.adjacent(v)) {
                 if (edge.other(v) > v) {
@@ -77,6 +86,7 @@ export class Graph extends GraphBase implements IGraph {
                 }
             }
         }
+        Assert.isTrue(this._num_edges === edges.length);
         return edges;
     }
 }
@@ -84,17 +94,19 @@ export class Graph extends GraphBase implements IGraph {
 /** Directed weighted graph */
 export class DiGraph extends GraphBase implements IGraph {
 
-    public add_edge(p: number, q: number, weight: number): void {
+    public add_edge(p: number, q: number, weight: number = 1): void {
         this.add_directed_edge(p, q, weight);
+        this._num_edges++;
     }
 
     public get_edges(): Edge[] {
-        const edges: Edge[] = [];
+        let edges: Edge[] = [];
         for (const adj of this._adj) {
             if (adj !== undefined) {
-                edges.concat(adj);
+                edges = edges.concat(adj);
             }
         }
+        Assert.isTrue(this._num_edges === edges.length);
         return edges;
     }
 }
