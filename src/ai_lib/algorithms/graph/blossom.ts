@@ -69,12 +69,6 @@ export class Blossom {
         }
 
         function readGraph() {
-
-            let n = graph.n,
-                e = graph.e;
-
-            //int n,e,a,b;
-            //scanf(" %d %d",&n,&e);      //The graph is read and its edges are unmatched by default.
             initGraph(n);               //Since C++ arrays are 0..n-1 and input 1..n , subtractions
             for (let i=0; i<e; i++){    //are made for better memory usage.
                 //scanf(" %d %d",&a,&b);
