@@ -149,12 +149,18 @@ export class TspComponent {
       const minWeightMatching = new AssignmentProblem(weightMatrix);
 
       // show matching
+      const marked = Array(oddNodes.length).fill(false);
       for (let i = 0; i < oddNodes.length - 1; i++) {
+        if (marked[i]) { continue; }
         const j = minWeightMatching.sol(i);
+        marked[i] = true;
+        marked[j] = true;
         const matchingEdge = new VisEdge(oddNodes[i].id, oddNodes[j].id);
         matchingEdge.color = <VisEdgeColor> {color: 'red'};
         this._graphEditor.addEdge(matchingEdge);
       }
+
+      console.log('asdf');
     },
     input => {
       switch (input) {

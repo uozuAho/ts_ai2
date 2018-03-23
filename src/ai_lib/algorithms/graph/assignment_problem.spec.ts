@@ -12,4 +12,14 @@ describe('AssignmentProblem', function() {
         expect(ap.sol(1)).toBe(0);
         expect(ap.weight()).toBe(2);
     });
+
+    it('3x3', function() {
+        const weights = [
+            [10, 1, 1],
+            [1, 10, 1],
+            [1, 1, 10]
+        ];
+        const ap = new AssignmentProblem(weights);
+        expect(ap.weight()).toBe(3);
+    });
 });
