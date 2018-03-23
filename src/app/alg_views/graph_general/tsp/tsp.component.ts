@@ -1,11 +1,14 @@
 import { Component, ViewChild } from '@angular/core';
 import { GraphEditorComponent } from '../../../shared/graph-editor/graph-editor.component';
-import { VisEdge, VisNode } from '../../../../libs/vis_wrappers/vis_network';
+import { VisEdge, VisNode, VisNetworkDef, VisEdgeColor } from '../../../../libs/vis_wrappers/vis_network';
 import { GraphT } from '../../../../ai_lib/structures/graphT';
 import { Mst } from '../../../../ai_lib/algorithms/graph/mst';
 import { IGraph } from '../../../../ai_lib/structures/igraph';
 import { Graph } from '../../../../ai_lib/structures/graph';
 import { FlowNetwork, FlowEdge } from '../../../../ai_lib/structures/flow_network';
+import { BipartiteX } from '../../../../ai_lib/algorithms/graph/bipartiteX';
+import { MaxFlow } from '../../../../ai_lib/algorithms/graph/max_flow';
+import { AssignmentProblem } from '../../../../ai_lib/algorithms/graph/assignment_problem';
 
 @Component({
   selector: 'app-tsp',
@@ -22,6 +25,7 @@ export class TspComponent {
   private _originalGraph: GraphT<VisNode>;
   private _mst: IGraph;
   private _mstOddDGraph: GraphT<VisNode>;
+  private _hungFlowNet: FlowNetwork;
 
   @ViewChild(GraphEditorComponent) private _graphEditor: GraphEditorComponent;
 
@@ -113,44 +117,44 @@ export class TspComponent {
       const oddNodes = this._mstOddDGraph.get_nodes();
       for (let i = 0; i < oddNodes.length - 1; i++) {
         for (let j = i + 1; j < oddNodes.length; j++) {
-          this._mstOddDGraph.add_edge(i, j);
+          this._mstOddDGraph.add_edge(i, j, nodes[i].distanceSquaredTo(nodes[j]));
         }
       }
     },
     input => {
       switch (input) {
         case StateInput.Back: return this.getMstState;
-        case StateInput.Next: return this.hungarianState;
+        case StateInput.Next: return this.matchOddDegreeMstNodes;
         default: return this._currentState;
       }
     }
   );
 
-  private hungarianState = new AlgViewerState(
+  private matchOddDegreeMstNodes = new AlgViewerState(
     () => {
-      this.currentStepText = 'Hungarian algorithm';
-      // for each node, subtract min edge weight from all edges
-      const nodes = this._mstOddDGraph.get_nodes();
-      for (let i = 0; i < nodes.length; i++) {
-        const adj = this._mstOddDGraph.adjacent(i);
-        const minWeight = Math.min(...adj.map(e => e.weight));
-        if (minWeight > 0) {
-          for (const a of adj) {
-            a.weight -= minWeight;
+      this.currentStepText = 'Find minimum weight matching of odd degree cities';
+      const weightMatrix = [];
+      const oddNodes = this._mstOddDGraph.get_nodes();
+      for (let i = 0; i < oddNodes.length; i++) {
+        const thisNode = oddNodes[i];
+        weightMatrix[i] = oddNodes.map(n => {
+          if (n === thisNode) {
+            // ensure node can't be matched to itself
+            return Number.MAX_VALUE;
+          } else {
+            return thisNode.distanceSquaredTo(n);
           }
-        }
+        });
       }
-      // get maximum matching using 0-weight edges
-      const flownet = new FlowNetwork(this._mstOddDGraph.num_nodes() + 2);
-      const flowSourceIdx = this._mstOddDGraph.num_nodes();
-      const flowSinkIdx = flowSourceIdx + 1;
-      // add zero weight edges
-      for (const e of this._mstOddDGraph.get_edges()) {
-        if (e.weight === 0) {
-          flownet.add_edge(new FlowEdge(e.from, e.to, 1));
-        }
+      const minWeightMatching = new AssignmentProblem(weightMatrix);
+
+      // show matching
+      for (let i = 0; i < oddNodes.length - 1; i++) {
+        const j = minWeightMatching.sol(i);
+        const matchingEdge = new VisEdge(oddNodes[i].id, oddNodes[j].id);
+        matchingEdge.color = <VisEdgeColor> {color: 'red'};
+        this._graphEditor.addEdge(matchingEdge);
       }
-      // TODO: check if graph is bipartite, separate nodes into sets X, Y, connect source to X, sink to Y
     },
     input => {
       switch (input) {

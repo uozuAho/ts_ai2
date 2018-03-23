@@ -66,11 +66,7 @@ export class VisNetwork {
 
     /** Add edge between specified node ids */
     public addEdge(edge: VisEdge): string | number {
-        const ids = this._edges.add({
-            id: edge.id,
-            from: edge.from,
-            to: edge.to
-        });
+        const ids = this._edges.add(edge);
         const id = ids[0];
         edge.id = id;
         return id;
@@ -196,14 +192,7 @@ export class VisNetwork {
 
 /** Definition of a network */
 export class VisNetworkDef {
-
-    public nodes: VisNode[];
-    public edges: VisEdge[];
-
-    public constructor(nodes: VisNode[] = null, edges: VisEdge[] = null) {
-        this.nodes = nodes;
-        this.edges = edges;
-    }
+    public constructor(public nodes: VisNode[] = [], public edges: VisEdge[] = []) {}
 }
 
 /** Definition of a vis network node */
@@ -223,6 +212,10 @@ export class VisNode {
         this.label = label;
         this.x = x;
         this.y = y;
+    }
+
+    public distanceSquaredTo(other: VisNode): number {
+        return Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2);
     }
 }
 

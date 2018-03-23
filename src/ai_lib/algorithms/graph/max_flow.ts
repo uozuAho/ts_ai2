@@ -39,20 +39,22 @@ export class MaxFlow {
      * @throws Error if initial flow is infeasible
      */
     public constructor(network: FlowNetwork, source: number, sink: number) {
-        this._num_vertices = network.num_vertices();
-        this.validate(source);
-        this.validate(sink);
+        this._num_vertices = network.num_nodes();
+        this.throwIfOutOfRange(source);
+        this.throwIfOutOfRange(sink);
         if (source === sink) {
             throw new Error('Source equals sink');
         }
-        if (!this.is_feasible(network, source, sink)) {
-            throw new Error('Initial flow is infeasible');
+        this._value = this.excess(network, sink);
+        try {
+            this.throwIfFlowInvalid(network, source, sink);
+        } catch (error) {
+            throw new Error('Initial flow is infeasible: ' + error);
         }
 
         this._edges = new Set<FlowEdge>();
 
         // while there exists an augmenting path, use it
-        this._value = this.excess(network, sink);
         while (this.has_augmenting_path(network, source, sink)) {
 
             // compute bottleneck capacity
@@ -71,10 +73,7 @@ export class MaxFlow {
             this._value += bottle;
         }
 
-        // check optimality conditions
-        if (!this.check(network, source, sink)) {
-            throw new Error('uh... not optimal');
-        }
+        this.validateSelf(network, source, sink);
     }
 
     /**
@@ -92,7 +91,7 @@ export class MaxFlow {
      * @throws Error unless 0 <= v < V
      */
     public is_in_cut(v: number): boolean {
-        this.validate(v);
+        this.throwIfOutOfRange(v);
         if (!this._marked[v]) { return false; }
         return this._marked[v];
     }
@@ -102,8 +101,7 @@ export class MaxFlow {
         return this._edges;
     }
 
-    // throw an Error if v is outside prescibed range
-    private validate(v: number): void {
+    private throwIfOutOfRange(v: number): void {
         if (v < 0 || v >= this._num_vertices) {
             throw new Error('vertex ' + v + ' is not between 0 and ' + (this._num_vertices - 1));
         }
@@ -147,54 +145,52 @@ export class MaxFlow {
     private excess(network: FlowNetwork, v: number): number {
         let excess = 0.0;
         for (const edge of network.incident(v)) {
-            if (v === edge.from()) { excess -= edge.flow(); } else {                  excess += edge.flow(); }
+            if (v === edge.from()) { excess -= edge.flow(); }
+            else { excess += edge.flow(); }
         }
         return excess;
     }
 
-    private is_feasible(G: FlowNetwork, s: number, t: number): boolean {
+    private throwIfFlowInvalid(network: FlowNetwork, source: number, sink: number) {
         // check that capacity constraints are satisfied
-        for (let v = 0; v < G.num_vertices(); v++) {
-            for (const e of G.incident(v)) {
+        for (let v = 0; v < network.num_nodes(); v++) {
+            for (const e of network.incident(v)) {
                 if (e.flow() < -MaxFlow.FLOATING_POINT_EPSILON || e.flow() > e.capacity() + MaxFlow.FLOATING_POINT_EPSILON) {
-                    return false;
+                    throw new Error(`invalid flow ${e.flow()} for edge (${e.from()},${e.to()})`);
                 }
             }
         }
 
         // check that net flow into a vertex equals zero, except at source and sink
-        if (Math.abs(this._value + this.excess(G, s)) > MaxFlow.FLOATING_POINT_EPSILON) {
-            return false;
+        if (Math.abs(this._value + this.excess(network, source)) > MaxFlow.FLOATING_POINT_EPSILON) {
+            throw new Error('flow at source != network flow');
         }
-        if (Math.abs(this._value - this.excess(G, t)) > MaxFlow.FLOATING_POINT_EPSILON) {
-            return false;
+        if (Math.abs(this._value - this.excess(network, sink)) > MaxFlow.FLOATING_POINT_EPSILON) {
+            throw new Error('flow at sink != network flow');
         }
-        for (let v = 0; v < G.num_vertices(); v++) {
-            if (v === s || v === t) { continue; } else if (Math.abs(this.excess(G, v)) > MaxFlow.FLOATING_POINT_EPSILON) {
-                return false;
+        for (let v = 0; v < network.num_nodes(); v++) {
+            if (v === source || v === sink) { continue; }
+            else if (Math.abs(this.excess(network, v)) > MaxFlow.FLOATING_POINT_EPSILON) {
+                throw new Error(`flow in - out != 0 at node ${v}`);
             }
         }
-        return true;
     }
 
-    // check optimality conditions
-    private check(G: FlowNetwork, s: number, t: number): boolean {
-        // check that flow is feasible
-        if (!this.is_feasible(G, s, t)) {
-            return false;
-        }
+    // check validity conditions, throw errors
+    private validateSelf(network: FlowNetwork, source: number, sink: number) {
+        this.throwIfFlowInvalid(network, source, sink);
         // check that s is on the source side of min cut and that t is not on source side
-        if (!this.is_in_cut(s)) {
-            return false;
+        if (!this.is_in_cut(source)) {
+            throw new Error('source not on source side of min cut');
         }
-        if (this.is_in_cut(t)) {
-            return false;
+        if (this.is_in_cut(sink)) {
+            throw new Error('sink not on sink side of min cut');
         }
 
         // check that value of min cut = value of max flow
         let mincutValue = 0.0;
-        for (let v = 0; v < G.num_vertices(); v++) {
-            for (const e of G.incident(v)) {
+        for (let v = 0; v < network.num_nodes(); v++) {
+            for (const e of network.incident(v)) {
                 if ((v === e.from()) && this.is_in_cut(e.from()) && !this.is_in_cut(e.to())) {
                     mincutValue += e.capacity();
                 }
@@ -202,9 +198,7 @@ export class MaxFlow {
         }
 
         if (Math.abs(mincutValue - this._value) > MaxFlow.FLOATING_POINT_EPSILON) {
-            return false;
+            throw new Error('min cut != max flow');
         }
-
-        return true;
     }
 }

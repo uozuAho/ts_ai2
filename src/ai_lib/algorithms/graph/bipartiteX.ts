@@ -72,21 +72,21 @@ export class BipartiteX {
     }
 
     private bfs(G: IGraph, s: number) {
-        const q = new FifoQueue<number>();
+        const toExplore = new FifoQueue<number>();
         this._color[s] = WHITE;
         this._marked[s] = true;
-        q.push(s);
+        toExplore.push(s);
 
-        while (!q.isEmpty()) {
-            const v = q.pop();
-            for (const w of G.adjacent(v).map(e => e.to)) {
-                if (!this._marked[w]) {
-                    this._marked[w] = true;
-                    this._edgeTo[w] = v;
-                    this._color[w] = !this._color[v];
-                    q.push(w);
+        while (!toExplore.isEmpty()) {
+            const thisNode = toExplore.pop();
+            for (const adjNode of G.adjacent(thisNode).map(e => e.other(thisNode))) {
+                if (!this._marked[adjNode]) {
+                    this._marked[adjNode] = true;
+                    this._edgeTo[adjNode] = thisNode;
+                    this._color[adjNode] = !this._color[thisNode];
+                    toExplore.push(adjNode);
                 }
-                else if (this._color[w] === this._color[v]) {
+                else if (this._color[adjNode] === this._color[thisNode]) {
                     this._isBipartite = false;
 
                     // to form odd cycle, consider s-v path and s-w path
@@ -95,7 +95,7 @@ export class BipartiteX {
                     // Note: distTo[v] == distTo[w];
                     this._cycle = new FifoQueue<number>();
                     const stack: number[] = [];
-                    let x = v, y = w;
+                    let x = thisNode, y = adjNode;
                     while (x !== y) {
                         stack.push(x);
                         this._cycle.push(y);
@@ -106,7 +106,7 @@ export class BipartiteX {
                     while (stack.length > 0) {
                         this._cycle.push(stack.pop());
                     }
-                    this._cycle.push(w);
+                    this._cycle.push(adjNode);
                     return;
                 }
             }
