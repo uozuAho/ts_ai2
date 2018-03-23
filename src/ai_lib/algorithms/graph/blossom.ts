@@ -10,7 +10,7 @@
 export class Blossom {
 
     public doEverything() {
-        var MAX = 100,
+        const MAX = 100,
             undef = -2,
             empty = -1,
             noEdge = 0,
@@ -20,62 +20,65 @@ export class Blossom {
             reverse = 0;
 
                                         //Labels are the key to this implementation of the algorithm.
-        function Label(){                //An even label in a vertex means there's an alternating path
+        function Label() {                //An even label in a vertex means there's an alternating path
             this.even = undefined;    //of even length starting from the root node that ends on the
             this.odd = new Array(2);  //vertex. To find this path, the backtrace() function is called,
-        };                               //constructing the path by following the content of the labels.
+        }                               //constructing the path by following the content of the labels.
                                         //Odd labels are similar, the only difference is that base nodes
                                         //of blossoms inside other blossoms may have two. More on this later.
 
-        function elem(){               //This is the element of the queue of labels to be analyzed by
+        function elem() {               //This is the element of the queue of labels to be analyzed by
             this.vertex = undefined;
             this.type = undefined;  //the augmentMatching() procedure. Each element contains the vertex
-        };                             //where the label is and its type, odd or even.
+        }                             //where the label is and its type, odd or even.
 
-        var g = new Array(MAX);         //The graph, as an adjacency matrix.
-        for (var i=0; i<MAX; i++){
+        const g = new Array(MAX);         //The graph, as an adjacency matrix.
+        for (let i = 0; i < MAX; i++) {
         g[i] = new Array(MAX);
         }
                                     //blossom[i] contains the base node of the blossom the vertex i
-        var blossom = new Array(MAX); //is in. This, together with labels eliminates the need to
+        const blossom = new Array(MAX); //is in. This, together with labels eliminates the need to
                                     //contract the graph.
 
                                     //The path arrays are where the backtrace() routine will
-        var path = new Array(2);
-        for (var i=0; i<2; i++){
+        const path = new Array(2);
+        for (let i = 0; i < 2; i++) {
         path[i] = new Array(MAX);
         }
-        var endPath = new Array(2);   //store the paths it finds. Only two paths need to be
+        const endPath = new Array(2);   //store the paths it finds. Only two paths need to be
                                     //stored. endPath[p] denotes the end of path[p].
-        var match = new Array(MAX);  //An array of flags. match[i] stores if vertex i is in the matching.
+        const match = new Array(MAX);  //An array of flags. match[i] stores if vertex i is in the matching.
                         //label[i] contains the label assigned to vertex i. It may be undefined,
-        var label = new Array(MAX); //empty (meaning the node is a root) and a node might have even and odd
+        const label = new Array(MAX); //empty (meaning the node is a root) and a node might have even and odd
                         //labels at the same time, which is the case for nonbase nodes of blossoms
-        for (var i=0; i<MAX; i++){
+        for (let i = 0; i < MAX; i++) {
         label[i] = new Label();
         }
-        var queue = new Array(2*MAX);         //The queue is necessary for efficiently scanning all labels.
-        var queueFront,queueBack;  //A label is enqueued when assigned and dequeued after scanned.
-        for (var i=0; i<2*MAX; i++){
+        const queue = new Array(2 * MAX);         //The queue is necessary for efficiently scanning all labels.
+        let queueFront,queueBack;  //A label is enqueued when assigned and dequeued after scanned.
+        for (let i = 0; i < 2 * MAX; i++) {
         queue[i] = new elem();
         }
 
-        function initGraph(n){
-            for (var i=0; i<n; i++)
-                for (var j=0; j<n; j++) g[i][j]=noEdge;
+        function initGraph(n) {
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    g[i][j] = noEdge;
+                }
+            }
         }
 
-        function readGraph(){
+        function readGraph() {
 
-            var n = graph.n,
+            let n = graph.n,
                 e = graph.e;
 
             //int n,e,a,b;
             //scanf(" %d %d",&n,&e);      //The graph is read and its edges are unmatched by default.
             initGraph(n);               //Since C++ arrays are 0..n-1 and input 1..n , subtractions
-            for (var i=0; i<e; i++){    //are made for better memory usage.
+            for (let i=0; i<e; i++){    //are made for better memory usage.
                 //scanf(" %d %d",&a,&b);
-                var a = graph[i][0],
+                let a = graph[i][0],
                     b = graph[i][1];
                 if (a!=b)
                     g[a-1][b-1]=g[b-1][a-1]=unmatched;
@@ -322,9 +325,8 @@ export class Blossom {
             while (augmentMatching(n));
         }
 
-        function main(){
-            var n;
-            n=readGraph();
+        function main() {
+            const num_nodes = readGraph();
             findMaximumMatching(n);
             for (var i=0; i<n; i++){
                 for (var j=i+1; j<n; j++) if (g[i][j]==matched)
