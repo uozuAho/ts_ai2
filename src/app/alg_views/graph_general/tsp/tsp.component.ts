@@ -5,10 +5,8 @@ import { GraphT } from '../../../../ai_lib/structures/graphT';
 import { Mst } from '../../../../ai_lib/algorithms/graph/mst';
 import { IGraph } from '../../../../ai_lib/structures/igraph';
 import { Graph } from '../../../../ai_lib/structures/graph';
-import { FlowNetwork, FlowEdge } from '../../../../ai_lib/structures/flow_network';
-import { BipartiteX } from '../../../../ai_lib/algorithms/graph/bipartiteX';
-import { MaxFlow } from '../../../../ai_lib/algorithms/graph/max_flow';
-import { AssignmentProblem } from '../../../../ai_lib/algorithms/graph/assignment_problem';
+import { Blossom } from '../../../../ai_lib/algorithms/graph/blossom';
+import { Assert } from '../../../../libs/assert/Assert';
 
 @Component({
   selector: 'app-tsp',
@@ -25,7 +23,6 @@ export class TspComponent {
   private _originalGraph: GraphT<VisNode>;
   private _mst: IGraph;
   private _mstOddDGraph: GraphT<VisNode>;
-  private _hungFlowNet: FlowNetwork;
 
   @ViewChild(GraphEditorComponent) private _graphEditor: GraphEditorComponent;
 
@@ -133,34 +130,37 @@ export class TspComponent {
   private matchOddDegreeMstNodes = new AlgViewerState(
     () => {
       this.currentStepText = 'Find minimum weight matching of odd degree cities';
-      const weightMatrix = [];
+      // create weighted edges for blossom algorithm
+      const blossomEdges = [];
       const oddNodes = this._mstOddDGraph.get_nodes();
-      for (let i = 0; i < oddNodes.length; i++) {
-        const thisNode = oddNodes[i];
-        weightMatrix[i] = oddNodes.map(n => {
-          if (n === thisNode) {
-            // ensure node can't be matched to itself
-            return Number.MAX_VALUE;
-          } else {
-            return thisNode.distanceSquaredTo(n);
+      let maxWeight = 0;
+      for (let i = 0; i < oddNodes.length - 1; i++) {
+        for (let j = i + 1; j < oddNodes.length; j++) {
+          const weight = oddNodes[i].distanceSquaredTo(oddNodes[j]);
+          blossomEdges.push([i, j, weight]);
+          if (weight > maxWeight) {
+            maxWeight = weight;
           }
-        });
+        }
       }
-      const minWeightMatching = new AssignmentProblem(weightMatrix);
+      // invert weights since our only blossom alg only does max matching
+      for (const edge of blossomEdges) {
+        edge[2] = maxWeight - edge[2];
+      }
+      const matches = new Blossom(blossomEdges).getMatches();
 
       // show matching
       const marked = Array(oddNodes.length).fill(false);
       for (let i = 0; i < oddNodes.length - 1; i++) {
         if (marked[i]) { continue; }
-        const j = minWeightMatching.sol(i);
+        const j = matches[i];
+        Assert.isTrue(j !== Blossom.NO_MATCH, 'should always find a perfect match');
         marked[i] = true;
         marked[j] = true;
         const matchingEdge = new VisEdge(oddNodes[i].id, oddNodes[j].id);
         matchingEdge.color = <VisEdgeColor> {color: 'red'};
         this._graphEditor.addEdge(matchingEdge);
       }
-
-      console.log('asdf');
     },
     input => {
       switch (input) {
