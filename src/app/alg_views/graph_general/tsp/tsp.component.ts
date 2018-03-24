@@ -228,21 +228,44 @@ export class TspComponent {
 
       Assert.isTrue(euler.hasEulerianCycle(), 'no cycle found!');
 
-      const cycle = Array.from(euler.cycle());
-      let prev = 0;
-      let current = 1;
-
-      // show cycle by highlighting nodes in sequence
-      this.findEulerCycle.data.timer = setInterval(() => {
-        const currentNode = this._nodes[cycle[current]];
-        const prevNode = this._nodes[cycle[prev]];
-        prev = current;
-        if (++current === cycle.length) {
-          current = 0;
+      // tour order is the order of nodes in the euler cycle
+      // note that the euler cycle may visit nodes twice, since
+      // MST + M may not be a simple graph
+      const tour: VisNode[] = [];
+      const tspSet = new Set<number>();
+      for (const idx of euler.cycle()) {
+        if (!tspSet.has(idx)) {
+          tspSet.add(idx);
+          tour.push(this._nodes[idx]);
         }
-        this.setNodeColor(currentNode, 'red');
-        this.setNodeColor(prevNode, 'blue');
-      }, 200);
+      }
+      // complete the tour by adding the first node to the end
+      tour.push(tour[0]);
+
+      // show the tour
+      this._graphEditor.deleteEdges();
+      for (let i = 1; i < tour.length; i++) {
+        const prev = tour[i - 1];
+        const curr = tour[i];
+        this._graphEditor.addEdge(new VisEdge(prev.id, curr.id));
+      }
+
+      // check the solution
+      if (tour.length !== this._nodes.length + 1) {
+        console.error(`tour length (${tour.length}) should equal number of nodes + 1 (${this._nodes.length + 1})`);
+      }
+      const nodeSet = new Set<VisNode>(this._nodes);
+      const visited = new Set<VisNode>();
+      for (const node of tour) {
+        if (visited.has(node) && node !== tour[0]) {
+          console.error(`node '${node.label}' is visited > 1 times`);
+        }
+        visited.add(node);
+        nodeSet.delete(node);
+      }
+      for (const node of nodeSet) {
+        console.error(`node '${node.label}' is not visited`);
+      }
     },
     input => {
       switch (input) {
