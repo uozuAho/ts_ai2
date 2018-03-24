@@ -7,6 +7,7 @@ import { IGraph, Edge } from '../../../../ai_lib/structures/igraph';
 import { Graph } from '../../../../ai_lib/structures/graph';
 import { Blossom } from '../../../../ai_lib/algorithms/graph/blossom';
 import { Assert } from '../../../../libs/assert/Assert';
+import { EulerianCycle } from '../../../../ai_lib/algorithms/graph/euler_cycle';
 
 @Component({
   selector: 'app-tsp',
@@ -40,6 +41,9 @@ export class TspComponent {
 
   private reset() {
     if (this._graphEditor) { this._graphEditor.clear(); }
+    if (this._currentState && this._currentState.onLeavingState !== null) {
+      this._currentState.onLeavingState();
+    }
     this._currentState = this.createGraphState;
     this._currentState.run();
   }
@@ -51,6 +55,9 @@ export class TspComponent {
     const prevState = this._currentState;
     this._currentState = this._currentState.next(input);
     if (this._currentState !== prevState) {
+      if (prevState.onLeavingState !== null) {
+        prevState.onLeavingState();
+      }
       this._currentState.run();
     }
   }
@@ -191,16 +198,6 @@ export class TspComponent {
     () => {
       this.currentStepText = 'Add min weight match edges to MST';
 
-      // build MST + M
-      // const mstPlus = new GraphT<VisNode>();
-      // this._originalGraph.get_nodes().forEach(n => mstPlus.add_node(n));
-      // this._mst.get_edges().forEach(e => mstPlus.add_edge(e.from, e.to, e.weight));
-      // this._minOddDMatches.forEach(e => mstPlus.add_edge(e.from, e.to, e.weight));
-      // this._mstPlusOddMatching = mstPlus;
-
-      // show MST + M
-      // this.displayGraph(this._mstPlusOddMatching);
-
       // Current display should include MST + M edges, with M nodes & edges highlighted.
       // Just reset all edge styles.
       const displayGraph = this.getCurrentDisplayGraph();
@@ -217,10 +214,44 @@ export class TspComponent {
     input => {
       switch (input) {
         case StateInput.Back: return this.matchOddDegreeMstNodes;
-        case StateInput.Next: return this.tempEndState;
+        case StateInput.Next: return this.findEulerCycle;
         default: return this._currentState;
       }
     }
+  );
+
+  private findEulerCycle = new AlgViewerState(
+    () => {
+      this.currentStepText = 'Find euler cycle of resulting graph';
+
+      const euler = new EulerianCycle(this._graphEditor.getGraph());
+
+      Assert.isTrue(euler.hasEulerianCycle(), 'no cycle found!');
+
+      const cycle = Array.from(euler.cycle());
+      let prev = 0;
+      let current = 1;
+
+      // show cycle by highlighting nodes in sequence
+      this.findEulerCycle.data.timer = setInterval(() => {
+        const currentNode = this._nodes[current];
+        const prevNode = this._nodes[prev];
+        prev = current;
+        if (++current === cycle.length) {
+          current = 0;
+        }
+        this._graphEditor.editNode(currentNode.id, n => n.color = 'red');
+        this._graphEditor.editNode(prevNode.id, n => n.color = 'blue');
+      }, 300);
+    },
+    input => {
+      switch (input) {
+        case StateInput.Back: return this.createMstPlusOddMatches;
+        case StateInput.Next: return this.tempEndState;
+        default: return this._currentState;
+      }
+    },
+    () => { clearInterval(this.findEulerCycle.data.timer); }
   );
 
   private tempEndState = new AlgViewerState(
@@ -255,6 +286,8 @@ enum StateInput {
 class AlgViewerState {
   constructor(
     public run: (() => void),
-    public next: ((input: StateInput) => AlgViewerState)) {
+    public next: ((input: StateInput) => AlgViewerState),
+    public onLeavingState: (() => void) = null,
+    private data: any = {}) {
   }
 }
