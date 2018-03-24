@@ -18,6 +18,7 @@ import { GraphEditorComponent } from './shared/graph-editor/graph-editor.compone
 import { EditNodeDialogComponent } from './shared/graph-editor/edit-node-dialog.component';
 import { MstComponent } from './alg_views/graph_general/mst/mst.component';
 import { TspComponent } from './alg_views/graph_general/tsp/tsp.component';
+import { PandemicComponent } from './games/pandemic/pandemic.component';
 
 
 @NgModule({
@@ -32,7 +33,8 @@ import { TspComponent } from './alg_views/graph_general/tsp/tsp.component';
     GraphEditorComponent,
     EditNodeDialogComponent,
     MstComponent,
-    TspComponent
+    TspComponent,
+    PandemicComponent
   ],
   imports: [
     AppRoutingModule,
