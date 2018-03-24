@@ -15,6 +15,14 @@ Currently migrating visualisations from https://github.com/uozuAho/ts_ai
 - everything else is part of the angular framework, which contains
   visualisations of some algorithms, and runs tests
 
+## To do
+
+- categorise items in the side bar
+- add search to side bar
+- pandemic WIP
+- graph alg viewer - make this a graph search viewer for now
+
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.1.
 
 ## Development server
