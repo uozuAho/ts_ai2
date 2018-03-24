@@ -64,7 +64,7 @@ export class TspComponent {
 
   private createGraphState = new AlgViewerState(
     () => {
-      this.currentStepText = 'Create a map of cities. Don\'t worry about edges, they\'ll be generated';
+      this.currentStepText = 'Create a map of nodes. Don\'t worry about edges, they\'ll be generated';
       this.nextButtonText = 'Next';
     },
     input => {
@@ -117,7 +117,7 @@ export class TspComponent {
 
   private getOddDegreeMstNodes = new AlgViewerState(
     () => {
-      this.currentStepText = 'Find cities with odd degree in MST';
+      this.currentStepText = 'Find nodes with odd degree in MST';
 
       this._mstOddDGraph = new GraphT<VisNode>();
       for (let i = 0; i < this._nodes.length; i++) {
@@ -222,7 +222,8 @@ export class TspComponent {
 
   private findEulerCycle = new AlgViewerState(
     () => {
-      this.currentStepText = 'Find euler cycle of resulting graph';
+      this.currentStepText = 'Find euler cycle of resulting graph, then visit the nodes in the ' +
+                             'order that they first appear in the cycle.';
 
       const euler = new EulerianCycle(this._graphEditor.getGraph());
 
@@ -270,19 +271,10 @@ export class TspComponent {
     input => {
       switch (input) {
         case StateInput.Back: return this.createMstPlusOddMatches;
-        case StateInput.Next: return this.tempEndState;
         default: return this._currentState;
       }
     },
     () => { clearInterval(this.findEulerCycle.data.timer); }
-  );
-
-  private tempEndState = new AlgViewerState(
-    () => {
-      this.currentStepText = 'Not yet implemented :)';
-      this.nextButtonText = 'N/A';
-    },
-    input => this.tempEndState
   );
 
   private displayGraph(graph: GraphT<VisNode>) {
