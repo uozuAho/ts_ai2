@@ -1,50 +1,53 @@
-import { PandemicBoard, City } from './pandemic_board';
-import { CanvasDrawer } from '../../ai_lib/vis/canvasDrawer';
-import { Edge } from '../../ai_lib/structures/graph';
+import { Component, AfterViewInit } from '@angular/core';
 
-export class PandemicDrawer {
+import { PandemicBoard, City } from './pandemic_board';
+import { GraphEditorComponent } from '../../shared/graph-editor/graph-editor.component';
+import { VisNode, VisNetworkDef } from '../../../libs/vis_wrappers/vis_network';
+
+@Component({
+  selector: 'app-pandemic-drawer',
+  template: '<p>drawer</p>',
+  styleUrls: []
+})
+export class PandemicDrawerComponent extends GraphEditorComponent {
 
     private _height: number;
     private _width: number;
-    private _draw: CanvasDrawer;
     private _board: PandemicBoard;
 
-    constructor(canvasId: string, height: number, width: number,
-            board: PandemicBoard) {
-        let canvas = <HTMLCanvasElement>document.getElementById(canvasId);
-        this._draw = new CanvasDrawer(canvas, height, width);
-        this._height = height;
-        this._width = width;
-        this._board = board;
+    constructor() {
+        super(null);
+        // this._height = height;
+        // this._width = width;
+        // this._board = board;
     }
 
     public redraw() {
-        this._draw.clear();
+        this.clear();
     }
 
-    public drawBoard() {
-        this._draw.rect(0, 0, this._width, this._height, this._draw.DARK_GREY);
-        this._board.getEdges().forEach(edge => {
-            this.drawEdge(edge);
-        });
-        this._board.getCities().forEach(city => {
-            this.drawCity(city);
-        });
+    public drawBoard(board: PandemicBoard) {
+        // this._board.getEdges().forEach(edge => {
+        //     this.drawEdge(edge);
+        // });
+        // this._board.getCities().forEach(city => {
+        //     this.drawCity(city);
+        // });
+        const nodes = this._board.getCities().map(c => this.cityToVisNode(c));
+        // todo: edges
+        const def = new VisNetworkDef(nodes);
+        this.setGraph(def);
     }
 
-    private drawCity(city: City) {
-        let getColour = (city: City) => {
-            if (city.colour == PandemicBoard.RED) return this._draw.RED;
-            if (city.colour == PandemicBoard.BLUE) return this._draw.BLUE;
-            if (city.colour == PandemicBoard.BLACK) return this._draw.BLACK;
-            if (city.colour == PandemicBoard.YELLOW) return this._draw.YELLOW;
-        };
-        this._draw.circle(city.location.x, city.location.y, 3, getColour(city));
-    }
+    private cityToVisNode(city: City): VisNode {
+        const node = new VisNode(city.name, city.name, city.location.x, city.location.y);
+        node.color = city.colour;
+        return node;
+     }
 
-    private drawEdge(edge: Edge<City>) {
-        let p1 = edge.from.location;
-        let p2 = edge.to.location;
-        this._draw.line(p1.x, p1.y, p2.x, p2.y, this._draw.GREY);
-    }
+    // private drawEdge(edge: Edge<City>) {
+    //     let p1 = edge.from.location;
+    //     let p2 = edge.to.location;
+    //     this._draw.line(p1.x, p1.y, p2.x, p2.y, this._draw.GREY);
+    // }
 }
