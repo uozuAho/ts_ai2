@@ -124,7 +124,7 @@ export class TspComponent {
         const node = this._nodes[i];
         if (this._mst.degree(i) % 2 === 1) {
           this._mstOddDGraph.add_node(node);
-          this._graphEditor.editNode(node.id, n => n.color = 'red');
+          this.setNodeColor(node, 'red');
         }
       }
       // connect all nodes in new graph
@@ -202,7 +202,7 @@ export class TspComponent {
       // Just reset all edge styles.
       const displayGraph = this.getCurrentDisplayGraph();
       for (const node of displayGraph.nodes) {
-        this._graphEditor.editNode(node.id, n => n.color = 'blue');
+        this.setNodeColor(node, 'blue');
       }
       for (const edge of displayGraph.edges) {
         this._graphEditor.editEdge(edge.id, e => {
@@ -234,15 +234,15 @@ export class TspComponent {
 
       // show cycle by highlighting nodes in sequence
       this.findEulerCycle.data.timer = setInterval(() => {
-        const currentNode = this._nodes[current];
-        const prevNode = this._nodes[prev];
+        const currentNode = this._nodes[cycle[current]];
+        const prevNode = this._nodes[cycle[prev]];
         prev = current;
         if (++current === cycle.length) {
           current = 0;
         }
-        this._graphEditor.editNode(currentNode.id, n => n.color = 'red');
-        this._graphEditor.editNode(prevNode.id, n => n.color = 'blue');
-      }, 300);
+        this.setNodeColor(currentNode, 'red');
+        this.setNodeColor(prevNode, 'blue');
+      }, 200);
     },
     input => {
       switch (input) {
@@ -275,6 +275,14 @@ export class TspComponent {
 
   private getCurrentDisplayGraph(): VisNetworkDef {
     return this._graphEditor.getVisNetworkDef();
+  }
+
+  private setNodeColor(node: VisNode, color: string) {
+    this._graphEditor.editNode(node.id, n => {
+      n.color = color;
+      // hack to prevent xy coords resetting when physics is enabled
+      n.x = n.y = undefined;
+    });
   }
 }
 
