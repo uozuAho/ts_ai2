@@ -19,11 +19,17 @@ export class TspComponent {
   private backButtonText = 'Back';
   private nextButtonText = 'Done';
 
+  /** Current state of the demonstration state machine */
   private _currentState: AlgViewerState;
+
+  /******************************************************
+   Outputs of various states
+  ******************************************************/
   private _originalGraph: GraphT<VisNode>;
+  private _nodes: VisNode[];
   private _mst: IGraph;
   private _mstOddDGraph: GraphT<VisNode>;
-  private _minOddDMatches: Edge[];
+  private _minOddDMatches: VisEdge[];
   private _mstPlusOddMatching: GraphT<VisNode>;
 
   @ViewChild(GraphEditorComponent) private _graphEditor: GraphEditorComponent;
@@ -58,6 +64,7 @@ export class TspComponent {
       switch (input) {
         case StateInput.Next: {
           this._originalGraph = this._graphEditor.getGraph();
+          this._nodes = this._originalGraph.get_nodes();
           return this.getMstState;
         }
         default: return this._currentState;
@@ -67,27 +74,28 @@ export class TspComponent {
 
   private getMstState = new AlgViewerState(
     () => {
-      this.currentStepText = 'Get MST of fully connected cities graph';
+      this.currentStepText = 'Get MST of fully connected graph';
       this.nextButtonText = 'Next';
 
-      // find mst of fully connected nodes
-      const nodes = this._graphEditor.getNodes();
-      const graph = new Graph(nodes.length);
-      for (let i = 0; i < nodes.length - 1; i++) {
-        const ni = nodes[i];
-        for (let j = i + 1; j < nodes.length; j++) {
-          const nj = nodes[j];
-          const dist2 = Math.pow(ni.x - nj.x, 2) + Math.pow(ni.y - nj.y, 2);
-          graph.add_edge(i, j, dist2);
+      // fully connect starting graph, with weights equal to distance between nodes
+      const graph = new Graph(this._nodes.length);
+      for (let i = 0; i < this._nodes.length - 1; i++) {
+        const ni = this._nodes[i];
+        for (let j = i + 1; j < this._nodes.length; j++) {
+          const nj = this._nodes[j];
+          graph.add_edge(i, j, ni.distanceSquaredTo(nj));
         }
       }
+
+      // find mst of fully connected nodes
       this._mst = new Mst(graph);
 
+      // show MST:
       // delete any existing edges, populate MST edges
       this._graphEditor.deleteEdges();
       for (const edge of this._mst.get_edges()) {
-        const nodeFrom = nodes[edge.from];
-        const nodeTo = nodes[edge.to];
+        const nodeFrom = this._nodes[edge.from];
+        const nodeTo = this._nodes[edge.to];
         this._graphEditor.addEdge(new VisEdge(nodeFrom.id, nodeTo.id));
       }
     },
@@ -103,10 +111,10 @@ export class TspComponent {
   private getOddDegreeMstNodes = new AlgViewerState(
     () => {
       this.currentStepText = 'Find cities with odd degree in MST';
-      const nodes = this._originalGraph.get_nodes();
+
       this._mstOddDGraph = new GraphT<VisNode>();
-      for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i];
+      for (let i = 0; i < this._nodes.length; i++) {
+        const node = this._nodes[i];
         if (this._mst.degree(i) % 2 === 1) {
           this._mstOddDGraph.add_node(node);
           this._graphEditor.editNode(node.id, n => n.color = 'red');
@@ -116,7 +124,7 @@ export class TspComponent {
       const oddNodes = this._mstOddDGraph.get_nodes();
       for (let i = 0; i < oddNodes.length - 1; i++) {
         for (let j = i + 1; j < oddNodes.length; j++) {
-          this._mstOddDGraph.add_edge(i, j, nodes[i].distanceSquaredTo(nodes[j]));
+          this._mstOddDGraph.add_edge(i, j, oddNodes[i].distanceSquaredTo(oddNodes[j]));
         }
       }
     },
@@ -131,7 +139,8 @@ export class TspComponent {
 
   private matchOddDegreeMstNodes = new AlgViewerState(
     () => {
-      this.currentStepText = 'Find minimum weight matching of odd degree cities';
+      this.currentStepText = 'Find minimum weight matching of odd degree nodes';
+
       // create weighted edges for blossom algorithm
       const blossomEdges = [];
       const oddNodes = this._mstOddDGraph.get_nodes();
@@ -149,6 +158,8 @@ export class TspComponent {
       for (const edge of blossomEdges) {
         edge[2] = maxWeight - edge[2];
       }
+
+      // find matching
       const matches = new Blossom(blossomEdges).getMatches();
 
       // show matching
@@ -160,10 +171,11 @@ export class TspComponent {
         Assert.isTrue(j !== Blossom.NO_MATCH, 'should always find a perfect match');
         marked[i] = true;
         marked[j] = true;
-        const e = new VisEdge(oddNodes[i].id, oddNodes[j].id);
-        e.color = <VisEdgeColor> {color: 'red'};
-        this._minOddDMatches.push(new Edge(i, j, oddNodes[i].distanceSquaredTo(oddNodes[j])));
-        this._graphEditor.addEdge(e);
+        const edge = new VisEdge(oddNodes[i].id, oddNodes[j].id);
+        edge.color = <VisEdgeColor> {color: 'red'};
+        edge.width = 3;
+        this._minOddDMatches.push(edge);
+        this._graphEditor.addEdge(edge);
       }
     },
     input => {
@@ -180,14 +192,27 @@ export class TspComponent {
       this.currentStepText = 'Add min weight match edges to MST';
 
       // build MST + M
-      const mstPlus = new GraphT<VisNode>();
-      this._originalGraph.get_nodes().forEach(n => mstPlus.add_node(n));
-      this._mst.get_edges().forEach(e => mstPlus.add_edge(e.from, e.to, e.weight));
-      this._minOddDMatches.forEach(e => mstPlus.add_edge(e.from, e.to, e.weight));
-      this._mstPlusOddMatching = mstPlus;
+      // const mstPlus = new GraphT<VisNode>();
+      // this._originalGraph.get_nodes().forEach(n => mstPlus.add_node(n));
+      // this._mst.get_edges().forEach(e => mstPlus.add_edge(e.from, e.to, e.weight));
+      // this._minOddDMatches.forEach(e => mstPlus.add_edge(e.from, e.to, e.weight));
+      // this._mstPlusOddMatching = mstPlus;
 
       // show MST + M
-      this.displayGraph(this._mstPlusOddMatching);
+      // this.displayGraph(this._mstPlusOddMatching);
+
+      // Current display should include MST + M edges, with M nodes & edges highlighted.
+      // Just reset all edge styles.
+      const displayGraph = this.getCurrentDisplayGraph();
+      for (const node of displayGraph.nodes) {
+        this._graphEditor.editNode(node.id, n => n.color = 'blue');
+      }
+      for (const edge of displayGraph.edges) {
+        this._graphEditor.editEdge(edge.id, e => {
+          e.color = <VisEdgeColor> { color: 'blue' };
+          e.width = 1;
+        });
+      }
     },
     input => {
       switch (input) {
@@ -215,6 +240,10 @@ export class TspComponent {
     const nodes = graph.get_nodes();
     const edges = graph.get_edges().map(e => new VisEdge(nodes[e.from].id, nodes[e.to].id));
     return new VisNetworkDef(nodes, edges);
+  }
+
+  private getCurrentDisplayGraph(): VisNetworkDef {
+    return this._graphEditor.getVisNetworkDef();
   }
 }
 
