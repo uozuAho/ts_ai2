@@ -4,6 +4,9 @@ import { PandemicMapData } from './map';
 
 type Colour = string;
 
+/**
+ * Reads and converts map.ts for easy usage.
+ */
 export class PandemicBoard {
 
   public static readonly RED: Colour = 'red';
@@ -40,6 +43,8 @@ export class PandemicBoard {
       const cityIdxTo = cityIdIdxMap.get(edge[1]);
       this._cityGraph.add_edge(cityIdxFrom, cityIdxTo);
     });
+    // invert city y coords for canvas drawing
+    this.invertY();
   }
 
   public getCities(): City[] {
@@ -61,26 +66,9 @@ export class PandemicBoard {
       .map(i => this._cities[i]);
   }
 
-  /** Rescale city xy coords to fit in a WxH rect with origin (0,0)
-   *  Convenience method for drawing.
-  */
-  public rescaleXy(width: number, height: number) {
-    const rescale = function(pts: Point2d[], ax: string, min: number, max: number) {
-      const all = pts.map(p => p[ax]);
-      const oldmin = Math.min(...all);
-      const oldmax = Math.max(...all);
-      const scale = (max - min) / (oldmax - oldmin);
-      const offset = (min - oldmin) * scale;
-      pts.forEach(p => p[ax] = p[ax] * scale + offset);
-    };
-    rescale(this._cities.map(c => c.location), 'x', 0, width);
-    rescale(this._cities.map(c => c.location), 'y', 0, height);
-  }
-
-  /** Invert city y coords.
-   *  Convenience method for drawing.
+  /** Invert city y coords (since +y is down on canvas).
    */
-  public invertY() {
+  private invertY() {
     // mirror around mid point: (x - mid) * -1 + mid
     //                        = 2mid - x
     const allPts = this._cities.map(c => c.location.y);
