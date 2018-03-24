@@ -48,7 +48,7 @@ export class VisNetwork {
 
     public toNetworkDef(): VisNetworkDef {
         const nodes = this._nodes.map(n => new VisNode(n.id, n.label, n.x, n.y));
-        const edges = this._edges.map(e => new VisEdge(e.from, e.to));
+        const edges = this._edges.map(e => new VisEdge(e.from, e.to, e.id));
         return new VisNetworkDef(nodes, edges);
     }
 
