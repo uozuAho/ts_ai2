@@ -3,7 +3,7 @@ import { GraphEditorComponent } from '../../../shared/graph-editor/graph-editor.
 import { VisEdge, VisNode, VisNetworkDef, VisEdgeColor } from '../../../../libs/vis_wrappers/vis_network';
 import { GraphT } from '../../../../ai_lib/structures/graphT';
 import { Mst } from '../../../../ai_lib/algorithms/graph/mst';
-import { IGraph } from '../../../../ai_lib/structures/igraph';
+import { IGraph, Edge } from '../../../../ai_lib/structures/igraph';
 import { Graph } from '../../../../ai_lib/structures/graph';
 import { Blossom } from '../../../../ai_lib/algorithms/graph/blossom';
 import { Assert } from '../../../../libs/assert/Assert';
@@ -23,6 +23,8 @@ export class TspComponent {
   private _originalGraph: GraphT<VisNode>;
   private _mst: IGraph;
   private _mstOddDGraph: GraphT<VisNode>;
+  private _minOddDMatches: Edge[];
+  private _mstPlusOddMatching: GraphT<VisNode>;
 
   @ViewChild(GraphEditorComponent) private _graphEditor: GraphEditorComponent;
 
@@ -151,20 +153,45 @@ export class TspComponent {
 
       // show matching
       const marked = Array(oddNodes.length).fill(false);
+      this._minOddDMatches = [];
       for (let i = 0; i < oddNodes.length - 1; i++) {
         if (marked[i]) { continue; }
         const j = matches[i];
         Assert.isTrue(j !== Blossom.NO_MATCH, 'should always find a perfect match');
         marked[i] = true;
         marked[j] = true;
-        const matchingEdge = new VisEdge(oddNodes[i].id, oddNodes[j].id);
-        matchingEdge.color = <VisEdgeColor> {color: 'red'};
-        this._graphEditor.addEdge(matchingEdge);
+        const e = new VisEdge(oddNodes[i].id, oddNodes[j].id);
+        e.color = <VisEdgeColor> {color: 'red'};
+        this._minOddDMatches.push(new Edge(i, j, oddNodes[i].distanceSquaredTo(oddNodes[j])));
+        this._graphEditor.addEdge(e);
       }
     },
     input => {
       switch (input) {
         case StateInput.Back: return this.getOddDegreeMstNodes;
+        case StateInput.Next: return this.createMstPlusOddMatches;
+        default: return this._currentState;
+      }
+    }
+  );
+
+  private createMstPlusOddMatches = new AlgViewerState(
+    () => {
+      this.currentStepText = 'Add min weight match edges to MST';
+
+      // build MST + M
+      const mstPlus = new GraphT<VisNode>();
+      this._originalGraph.get_nodes().forEach(n => mstPlus.add_node(n));
+      this._mst.get_edges().forEach(e => mstPlus.add_edge(e.from, e.to, e.weight));
+      this._minOddDMatches.forEach(e => mstPlus.add_edge(e.from, e.to, e.weight));
+      this._mstPlusOddMatching = mstPlus;
+
+      // show MST + M
+      this.displayGraph(this._mstPlusOddMatching);
+    },
+    input => {
+      switch (input) {
+        case StateInput.Back: return this.matchOddDegreeMstNodes;
         case StateInput.Next: return this.tempEndState;
         default: return this._currentState;
       }
@@ -178,6 +205,17 @@ export class TspComponent {
     },
     input => this.tempEndState
   );
+
+  private displayGraph(graph: GraphT<VisNode>) {
+    const def = this.toNetworkDef(graph);
+    this._graphEditor.setGraph(def);
+  }
+
+  private toNetworkDef(graph: GraphT<VisNode>): VisNetworkDef {
+    const nodes = graph.get_nodes();
+    const edges = graph.get_edges().map(e => new VisEdge(nodes[e.from].id, nodes[e.to].id));
+    return new VisNetworkDef(nodes, edges);
+  }
 }
 
 enum StateInput {
