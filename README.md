@@ -1,8 +1,3 @@
-# Pandemic branch todo
-
-- pandemic should be an angular module since it has multiple components
-
-
 # Typescript ai playground
 
 Typescript implementation of stuff from [Artificial Intelligence: A Modern Approach][aibook],
