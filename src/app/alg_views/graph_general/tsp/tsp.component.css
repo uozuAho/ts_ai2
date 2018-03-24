@@ -1,0 +1,14 @@
+#btn-next {
+    float: right;
+}
+#box-container {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+}
+#box-steps {
+    flex: 0 1 auto;
+}
+#box-editor {
+    flex: 1 1 auto;
+}

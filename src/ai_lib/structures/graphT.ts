@@ -14,6 +14,10 @@ class GraphBase<T> {
         return this._graph.num_nodes();
     }
 
+    public num_edges(): number {
+        return this._graph.num_edges();
+    }
+
     public get_edges(): Edge[] {
         return this._graph.get_edges();
     }
@@ -31,6 +35,7 @@ class GraphBase<T> {
         return node;
     }
 
+    /** Add edge by node indes (not id) */
     public add_edge(p: number, q: number, weight: number = 1): void {
         this._graph.add_edge(p, q, weight);
     }

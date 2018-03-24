@@ -9,7 +9,7 @@ describe('MaxFlow', function() {
     it('simple', function() {
         const flow_net = new FlowNetwork(2);
         const edge = new FlowEdge(0, 1, 1);
-        flow_net.add_edge(edge);
+        flow_net.add_flow_edge(edge);
         const max_flow = new MaxFlow(flow_net, 0, 1);
 
         expect(max_flow.is_in_cut(0)).toBe(true);
@@ -21,10 +21,10 @@ describe('MaxFlow', function() {
     it('multipath', function() {
         // two paths from 0 to 3, each with 1 capacity
         const flow_net = new FlowNetwork(4);
-        flow_net.add_edge(new FlowEdge(0, 1, 1));
-        flow_net.add_edge(new FlowEdge(0, 2, 1));
-        flow_net.add_edge(new FlowEdge(1, 3, 1));
-        flow_net.add_edge(new FlowEdge(2, 3, 1));
+        flow_net.add_flow_edge(new FlowEdge(0, 1, 1));
+        flow_net.add_flow_edge(new FlowEdge(0, 2, 1));
+        flow_net.add_flow_edge(new FlowEdge(1, 3, 1));
+        flow_net.add_flow_edge(new FlowEdge(2, 3, 1));
         const max_flow = new MaxFlow(flow_net, 0, 3);
 
         expect(max_flow.is_in_cut(0)).toBe(true);
@@ -35,8 +35,8 @@ describe('MaxFlow', function() {
 
     it('undirected', function() {
         const flow_net = new FlowNetwork(2);
-        flow_net.add_edge(new FlowEdge(0, 1, 1));
-        flow_net.add_edge(new FlowEdge(1, 0, 1));
+        flow_net.add_flow_edge(new FlowEdge(0, 1, 1));
+        flow_net.add_flow_edge(new FlowEdge(1, 0, 1));
         const max_flow = new MaxFlow(flow_net, 0, 1);
 
         expect(max_flow.value()).toBe(1);
@@ -47,30 +47,30 @@ describe('MaxFlow', function() {
         const flow_net = new FlowNetwork(5);
 
         // 0 -> (1, 2)
-        flow_net.add_edge(new FlowEdge(0, 1, 1));
-        flow_net.add_edge(new FlowEdge(1, 0, 1));
-        flow_net.add_edge(new FlowEdge(0, 2, 1));
-        flow_net.add_edge(new FlowEdge(2, 0, 1));
+        flow_net.add_flow_edge(new FlowEdge(0, 1, 1));
+        flow_net.add_flow_edge(new FlowEdge(1, 0, 1));
+        flow_net.add_flow_edge(new FlowEdge(0, 2, 1));
+        flow_net.add_flow_edge(new FlowEdge(2, 0, 1));
 
         // source
         // 1 -> (2, 3, 4)
-        flow_net.add_edge(new FlowEdge(1, 2, 1));
-        flow_net.add_edge(new FlowEdge(2, 1, 1));
-        flow_net.add_edge(new FlowEdge(1, 3, 1));
-        flow_net.add_edge(new FlowEdge(3, 1, 1));
-        flow_net.add_edge(new FlowEdge(1, 4, 1));
-        flow_net.add_edge(new FlowEdge(4, 1, 1));
+        flow_net.add_flow_edge(new FlowEdge(1, 2, 1));
+        flow_net.add_flow_edge(new FlowEdge(2, 1, 1));
+        flow_net.add_flow_edge(new FlowEdge(1, 3, 1));
+        flow_net.add_flow_edge(new FlowEdge(3, 1, 1));
+        flow_net.add_flow_edge(new FlowEdge(1, 4, 1));
+        flow_net.add_flow_edge(new FlowEdge(4, 1, 1));
 
         // sink
         // 2 -> (3, 4)
-        flow_net.add_edge(new FlowEdge(2, 3, 1));
-        flow_net.add_edge(new FlowEdge(3, 2, 1));
-        flow_net.add_edge(new FlowEdge(2, 4, 1));
-        flow_net.add_edge(new FlowEdge(4, 2, 1));
+        flow_net.add_flow_edge(new FlowEdge(2, 3, 1));
+        flow_net.add_flow_edge(new FlowEdge(3, 2, 1));
+        flow_net.add_flow_edge(new FlowEdge(2, 4, 1));
+        flow_net.add_flow_edge(new FlowEdge(4, 2, 1));
 
         // 3 -> 4
-        flow_net.add_edge(new FlowEdge(3, 4, 1));
-        flow_net.add_edge(new FlowEdge(4, 3, 1));
+        flow_net.add_flow_edge(new FlowEdge(3, 4, 1));
+        flow_net.add_flow_edge(new FlowEdge(4, 3, 1));
 
         const max_flow = new MaxFlow(flow_net, 1, 2);
 

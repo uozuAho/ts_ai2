@@ -48,7 +48,7 @@ export class VisNetwork {
 
     public toNetworkDef(): VisNetworkDef {
         const nodes = this._nodes.map(n => new VisNode(n.id, n.label, n.x, n.y));
-        const edges = this._edges.map(e => new VisEdge(e.from, e.to));
+        const edges = this._edges.map(e => new VisEdge(e.from, e.to, e.id));
         return new VisNetworkDef(nodes, edges);
     }
 
@@ -65,13 +65,10 @@ export class VisNetwork {
     }
 
     /** Add edge between specified node ids */
-    public addEdge(from: string | number, to: string | number) {
-        const id = this._nextEdgeId++;
-        this._edges.add({
-            id: id,
-            from: from,
-            to: to
-        });
+    public addEdge(edge: VisEdge): string | number {
+        const ids = this._edges.add(edge);
+        const id = ids[0];
+        edge.id = id;
         return id;
     }
 
@@ -167,6 +164,14 @@ export class VisNetwork {
         };
     }
 
+    public deleteEdge(id: string | number) {
+        this._edges.remove(id);
+    }
+
+    public deleteEdges() {
+        this._edges.clear();
+    }
+
     /** Convert a node definition into a vis node */
     private toVisNode(node_def: VisNode): any {
         return node_def;
@@ -187,14 +192,7 @@ export class VisNetwork {
 
 /** Definition of a network */
 export class VisNetworkDef {
-
-    public nodes: VisNode[];
-    public edges: VisEdge[];
-
-    public constructor(nodes: VisNode[] = null, edges: VisEdge[] = null) {
-        this.nodes = nodes;
-        this.edges = edges;
-    }
+    public constructor(public nodes: VisNode[] = [], public edges: VisEdge[] = []) {}
 }
 
 /** Definition of a vis network node */
@@ -214,6 +212,10 @@ export class VisNode {
         this.label = label;
         this.x = x;
         this.y = y;
+    }
+
+    public distanceSquaredTo(other: VisNode): number {
+        return Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2);
     }
 }
 

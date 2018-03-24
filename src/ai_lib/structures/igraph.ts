@@ -1,5 +1,6 @@
 export interface IGraph {
     num_nodes(): number;
+    num_edges(): number;
     add_edge(p: number, q: number, weight: number): void;
     get_edges(): Edge[];
     /** Get edges incident to the given node */

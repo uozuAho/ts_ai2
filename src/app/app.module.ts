@@ -17,6 +17,7 @@ import { GraphAlgViewerComponent } from './graph-alg-viewer/graph-alg-viewer.com
 import { GraphEditorComponent } from './shared/graph-editor/graph-editor.component';
 import { EditNodeDialogComponent } from './shared/graph-editor/edit-node-dialog.component';
 import { MstComponent } from './alg_views/graph_general/mst/mst.component';
+import { TspComponent } from './alg_views/graph_general/tsp/tsp.component';
 
 
 @NgModule({
@@ -30,7 +31,8 @@ import { MstComponent } from './alg_views/graph_general/mst/mst.component';
     GraphAlgViewerComponent,
     GraphEditorComponent,
     EditNodeDialogComponent,
-    MstComponent
+    MstComponent,
+    TspComponent
   ],
   imports: [
     AppRoutingModule,

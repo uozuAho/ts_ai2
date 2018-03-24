@@ -1,0 +1,19 @@
+<h1>TSP</h1>
+<div id="box-container">
+  <div id="box-steps">
+    <p>Find a solution to the travelling salesman problem, using the
+      <a href="https://en.wikipedia.org/wiki/Christofides_algorithm">Christofides
+      algorithm</a>. This guarantees to find at worst a 3/2 approximation to the optimal
+      solution, in polynomial time.
+    </p>
+    <div style="display: flex; flex-flow: row;">
+      <p>{{currentStepText}}</p>
+      <button mat-button (click)="back()">{{backButtonText}}</button>
+      <button mat-button (click)="next()">{{nextButtonText}}</button>
+      <button mat-button (click)="reset()">Reset</button>
+    </div>
+  </div>
+  <div id="box-editor">
+    <app-graph-editor></app-graph-editor>
+  </div>
+</div>
