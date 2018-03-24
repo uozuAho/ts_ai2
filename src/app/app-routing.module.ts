@@ -9,6 +9,7 @@ import { IterativeDeepeningComponent } from './alg_views/search/iterative-deepen
 import { GraphAlgViewerComponent } from './graph-alg-viewer/graph-alg-viewer.component';
 import { MstComponent } from './alg_views/graph_general/mst/mst.component';
 import { TspComponent } from './alg_views/graph_general/tsp/tsp.component';
+import { PandemicComponent } from './games/pandemic/pandemic.component';
 
 const routes: Routes = [
   { path: 'search/astar', component: AstarComponent },
@@ -19,6 +20,7 @@ const routes: Routes = [
   { path: 'graph_alg_viewer', component: GraphAlgViewerComponent },
   { path: 'graph_general/mst', component: MstComponent },
   { path: 'graph_general/tsp', component: TspComponent },
+  { path: 'games/pandemic', component: PandemicComponent },
 ];
 
 @NgModule({
