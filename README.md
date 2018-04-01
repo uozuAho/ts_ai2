@@ -1,7 +1,8 @@
 # Typescript ai playground
 
 Typescript implementation of stuff from [Artificial Intelligence: A Modern Approach][aibook],
-plus other 'ai' doodlings.
+plus other 'ai' doodlings. Also amassing a fair few algorithms ported from java implementations at
+[Algorithms, 4th ed.][algs4].
 
 ## Project structure
 
@@ -49,3 +50,4 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 
 [aibook]: http://aima.cs.berkeley.edu/
+[algs4]: http://algs4.cs.princeton.edu
