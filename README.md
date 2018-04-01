@@ -3,8 +3,6 @@
 Typescript implementation of stuff from [Artificial Intelligence: A Modern Approach][aibook],
 plus other 'ai' doodlings.
 
-Currently migrating visualisations from https://github.com/uozuAho/ts_ai
-
 ## Project structure
 
 - ai_lib/ is a standalone 'ai' library
