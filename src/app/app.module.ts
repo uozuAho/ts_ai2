@@ -20,6 +20,7 @@ import { MstComponent } from './alg_views/graph_general/mst/mst.component';
 import { TspComponent } from './alg_views/graph_general/tsp/tsp.component';
 import { PandemicComponent } from './games/pandemic/pandemic.component';
 import { PandemicDrawerComponent } from './games/pandemic/pandemic_drawer';
+import { ToposortComponent } from './alg_views/toposort/toposort.component';
 
 
 @NgModule({
@@ -36,7 +37,8 @@ import { PandemicDrawerComponent } from './games/pandemic/pandemic_drawer';
     MstComponent,
     TspComponent,
     PandemicComponent,
-    PandemicDrawerComponent
+    PandemicDrawerComponent,
+    ToposortComponent
   ],
   imports: [
     AppRoutingModule,
