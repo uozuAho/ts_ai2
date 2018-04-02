@@ -93,8 +93,8 @@ export class ToposortComponent {
       this.showTopoOrderState.data.timer = setInterval(() => {
         const prevIdx = idx;
         if (++idx === order.length) { idx = 0; }
-        this._graphEditor.editNode(nodes[prevIdx].id, n => n.color = 'blue');
-        this._graphEditor.editNode(nodes[idx].id, n => n.color = 'red');
+        this._graphEditor.editNode(nodes[order[prevIdx]].id, n => n.color = 'blue');
+        this._graphEditor.editNode(nodes[order[idx]].id, n => n.color = 'red');
       }, 300);
     },
     input => {
