@@ -1,7 +1,8 @@
 import { Component, ViewChild } from '@angular/core';
-import { GraphT } from '../../../ai_lib/structures/graphT';
+import { DiGraphT } from '../../../ai_lib/structures/graphT';
 import { GraphEditorComponent } from '../../shared/graph-editor/graph-editor.component';
 import { VisNode } from '../../../libs/vis_wrappers/vis_network';
+import { TopoSort } from '../../../ai_lib/algorithms/graph/toposort';
 
 @Component({
   selector: 'app-toposort',
@@ -15,7 +16,8 @@ export class ToposortComponent {
   private nextButtonText = 'Done';
 
   private _currentState: AlgViewerState;
-  private _originalGraph: GraphT<VisNode>;
+  private _originalGraph: DiGraphT<VisNode>;
+  private _topoSort: TopoSort;
 
   @ViewChild(GraphEditorComponent) private _graphEditor: GraphEditorComponent;
 
@@ -54,12 +56,56 @@ export class ToposortComponent {
     input => {
       switch (input) {
         case StateInput.Next: {
-          this._originalGraph = this._graphEditor.getGraph();
-          return this.createGraphState;
+          this._originalGraph = this._graphEditor.getDiGraph();
+          return this.toposortState;
         }
         default: return this._currentState;
       }
     }
+  );
+
+  private toposortState = new AlgViewerState(
+    () => {
+      this.currentStepText = 'Attempt to order the vertices with a topological sort';
+      this.nextButtonText = 'Next';
+      this._topoSort = new TopoSort(this._originalGraph);
+    },
+    input => {
+      switch (input) {
+        case StateInput.Next: {
+          if (this._topoSort.hasOrder()) {
+            return this.showTopoOrderState;
+          }
+          return this._currentState;
+        }
+        default: return this._currentState;
+      }
+    }
+  );
+
+  private showTopoOrderState = new AlgViewerState(
+    () => {
+      this.currentStepText = 'Here\'s your order mister';
+      this.nextButtonText = 'Next';
+      let idx = 0;
+      const order = Array.from(this._topoSort.order());
+      const nodes = this._originalGraph.get_nodes();
+      this.showTopoOrderState.data.timer = setInterval(() => {
+        const prevIdx = idx;
+        if (++idx === order.length) { idx = 0; }
+        this._graphEditor.editNode(nodes[prevIdx].id, n => n.color = 'blue');
+        this._graphEditor.editNode(nodes[idx].id, n => n.color = 'red');
+      }, 300);
+    },
+    input => {
+      switch (input) {
+        case StateInput.Next: {
+          return this._currentState;
+        }
+        default: return this._currentState;
+      }
+    },
+    () => clearInterval(this.showTopoOrderState.data.timer)
   );
 }
 
@@ -73,6 +119,6 @@ class AlgViewerState {
     public run: (() => void),
     public next: ((input: StateInput) => AlgViewerState),
     public onLeavingState: (() => void) = null,
-    private data: any = {}) {
+    public data: any = {}) {
   }
 }
