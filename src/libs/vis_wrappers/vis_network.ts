@@ -8,6 +8,7 @@ import { Guid } from '../guid/guid';
 /** vis Network wrapper */
 export class VisNetwork {
 
+    private _isDirected: boolean;
     private _nextNodeId: number;
     private _nextEdgeId: number;
 
@@ -187,6 +188,14 @@ export class VisNetwork {
 
     public set isPhysicsEnabled(val: boolean) {
         this._network.setOptions({physics: {enabled: val}});
+    }
+
+    public get isDirected(): boolean {
+        return this._isDirected;
+    }
+
+    public set isDirected(val: boolean) {
+        this._network.setOptions({edges: {arrows: {to: val}}});
     }
 }
 

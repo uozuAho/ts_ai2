@@ -5,7 +5,7 @@ import * as FileSaver from 'file-saver';
 
 import { VisNetwork, VisNode, VisEdge, VisNetworkDef } from '../../../libs/vis_wrappers/vis_network';
 import { EditNodeDialogComponent, EditNodeDialogData } from './edit-node-dialog.component';
-import { GraphT, randomSquareGraph } from '../../../ai_lib/structures/graphT';
+import { GraphT, randomSquareGraph, DiGraphT } from '../../../ai_lib/structures/graphT';
 import { Graph } from '../../../ai_lib/structures/graph';
 import { IGraph } from '../../../ai_lib/structures/igraph';
 
@@ -24,6 +24,7 @@ export class GraphEditorComponent implements AfterViewInit {
     private _network: VisNetwork;
     private _isEditingNode: boolean;
     private _isPhysicsEnabled = true;
+    private _isDirected = false;
 
     @ViewChild('graphEditorDiv') private _networkElem: ElementRef;
 
@@ -89,12 +90,25 @@ export class GraphEditorComponent implements AfterViewInit {
         return this._network.getEdges();
     }
 
-    /** Get an IGraph representation of the current graph */
     public getGraph(): GraphT<VisNode> {
+        if (this.isDirected) {
+            throw new Error('graph is directed. Use getDiGraph()');
+        }
+        return this.getGraphImpl() as GraphT<VisNode>;
+    }
+
+    public getDiGraph(): DiGraphT<VisNode> {
+        if (!this.isDirected) {
+            throw new Error('graph is not directed. Use getGraph()');
+        }
+        return this.getGraphImpl() as DiGraphT<VisNode>;
+    }
+
+    private getGraphImpl(): GraphT<VisNode> | DiGraphT<VisNode> {
         const nodes = this._network.getNodes();
         // map node id --> array idx
         const nodeIdxMap = new Map<string | number, number>();
-        const graph = new GraphT<VisNode>();
+        const graph = this.isDirected ? new DiGraphT<VisNode>() : new GraphT<VisNode>();
         for (let i = 0; i < nodes.length; i++) {
             const node = nodes[i];
             nodeIdxMap.set(node.id, i);
@@ -161,6 +175,15 @@ export class GraphEditorComponent implements AfterViewInit {
     public set isPhysicsEnabled(val: boolean) {
         this._isPhysicsEnabled = val;
         this._network.isPhysicsEnabled = val;
+    }
+
+    public get isDirected(): boolean {
+        return this._isDirected;
+    }
+
+    public set isDirected(val: boolean) {
+        this._isDirected = val;
+        this._network.isDirected = val;
     }
 
     public redraw() {
