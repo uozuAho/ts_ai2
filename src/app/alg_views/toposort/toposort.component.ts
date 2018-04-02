@@ -3,6 +3,8 @@ import { DiGraphT } from '../../../ai_lib/structures/graphT';
 import { GraphEditorComponent } from '../../shared/graph-editor/graph-editor.component';
 import { VisNode } from '../../../libs/vis_wrappers/vis_network';
 import { TopoSort } from '../../../ai_lib/algorithms/graph/toposort';
+import { DirectedCycle } from '../../../ai_lib/algorithms/graph/directed_cycle';
+import { Assert } from '../../../libs/assert/Assert';
 
 @Component({
   selector: 'app-toposort',
@@ -75,8 +77,9 @@ export class ToposortComponent {
         case StateInput.Next: {
           if (this._topoSort.hasOrder()) {
             return this.showTopoOrderState;
+          } else {
+            return this.showCycleState;
           }
-          return this._currentState;
         }
         default: return this._currentState;
       }
@@ -106,6 +109,27 @@ export class ToposortComponent {
       }
     },
     () => clearInterval(this.showTopoOrderState.data.timer)
+  );
+
+  private showCycleState = new AlgViewerState(
+    () => {
+      this.currentStepText = 'Cannot order - contains a cycle. One cycle shown.';
+      const cycle = new DirectedCycle(this._originalGraph).getCycle();
+      Assert.isTrue(cycle.length > 0);
+      const nodes = this._originalGraph.get_nodes();
+      // colour in cycle nodes
+      for (const idx of cycle) {
+        this._graphEditor.editNode(nodes[idx].id, n => n.color = 'red');
+      }
+    },
+    input => {
+      switch (input) {
+        case StateInput.Next: {
+          return this._currentState;
+        }
+        default: return this._currentState;
+      }
+    },
   );
 }
 
