@@ -1,0 +1,15 @@
+<h1>Topological sort</h1>
+<div id="box-container">
+  <div id="box-steps">
+    <p>Playing with topo sorts with cycles</p>
+    <div style="display: flex; flex-flow: row;">
+      <p>{{currentStepText}}</p>
+      <button mat-button (click)="back()">{{backButtonText}}</button>
+      <button mat-button (click)="next()">{{nextButtonText}}</button>
+      <button mat-button (click)="reset()">Reset</button>
+    </div>
+  </div>
+  <div id="box-editor">
+    <app-graph-editor></app-graph-editor>
+  </div>
+</div>
