@@ -1,5 +1,5 @@
 import { Cell } from './cell';
-import { NaiveCalculator, CellsCalculator } from './cells_calculator';
+import { NaiveCalculator, CellsCalculator, TopoSortCalculator } from './cells_calculator';
 
 // simple test set
 const a = new Cell('a', 1);
@@ -55,6 +55,7 @@ function runAllCalculators(calculators: CellsCalculator[], cells: Cell[]) {
 
 const calcs = [];
 calcs['naive'] = new NaiveCalculator();
+calcs['topo'] = new TopoSortCalculator();
 
 console.log('##################');
 console.log('simple set:');
