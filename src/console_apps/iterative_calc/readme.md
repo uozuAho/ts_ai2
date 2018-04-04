@@ -21,3 +21,10 @@ Can't do a topological sort with cycles, so the idea is:
 A traversal (?) of a directed graph with cycles will never terminate,
 unless some cycle termination criteria is specified, eg. each node
 in the cycle is visited 3 times.
+
+
+# todo:
+- compare output values of each calculator (assert)
+- create some illustrative examples (eg. reverse topo order is bad)
+- create a calculator that does better than naive even when dependency
+  cycles exist

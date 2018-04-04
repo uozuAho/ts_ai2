@@ -66,11 +66,7 @@ class BaseCalculator {
 export class NaiveCalculator extends BaseCalculator implements CellsCalculator {
 
     public calculate(cells: Cell[]) {
-        const order = [];
-        for (let i = 0; i < cells.length; i++) {
-            order.push(i);
-        }
-        this.calculateInOrder(cells, order);
+        this.calculateInOrder(cells, range(cells.length));
     }
 }
 
@@ -78,6 +74,19 @@ export class NaiveCalculator extends BaseCalculator implements CellsCalculator {
 export class TopoSortCalculator extends BaseCalculator implements CellsCalculator {
 
     public calculate(cells: Cell[]) {
+        const cellsGraph = CellsGrapher.createGraph(cells);
+
+        const cycleFinder = new DirectedCycle(cellsGraph);
+        const order = cycleFinder.hasCycle()
+            ? range(cells.length)
+            : Array.from(new TopoSort(cellsGraph).order()).reverse();
+
+        this.calculateInOrder(cells, order);
+    }
+}
+
+export class CellsGrapher {
+    public static createGraph(cells: Cell[]): DiGraphT<Cell> {
         const cellsGraph = new DiGraphT<Cell>();
         for (const cell of cells) {
             cellsGraph.add_node(cell);
@@ -87,15 +96,19 @@ export class TopoSortCalculator extends BaseCalculator implements CellsCalculato
                 cellsGraph.add_edgeT(adj, cell);
             }
         }
-
-        const cycleFinder = new DirectedCycle(cellsGraph);
-        if (cycleFinder.hasCycle()) {
-            const naive = new NaiveCalculator(this.calculationLimit, this.convergenceThreshold);
-            naive.calculate(cells);
-        } else {
-            const topo = new TopoSort(cellsGraph);
-            const order = Array.from(topo.order());
-            this.calculateInOrder(cells, order);
-        }
+        return cellsGraph;
     }
+
+    public static containsCycle(graph: DiGraphT<Cell>): boolean {
+        return new DirectedCycle(graph).hasCycle();
+    }
+}
+
+// create an array of numbers from 0 to i
+function range(n: number): number[] {
+    const r = [];
+    for (let i = 0; i < n; i++) {
+        r.push(i);
+    }
+    return r;
 }

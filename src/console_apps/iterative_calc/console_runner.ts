@@ -1,5 +1,6 @@
 import { Cell } from './cell';
-import { NaiveCalculator, CellsCalculator, TopoSortCalculator } from './cells_calculator';
+import { NaiveCalculator, CellsCalculator, TopoSortCalculator, CellsGrapher } from './cells_calculator';
+import { DirectedCycle } from '../../ai_lib/algorithms/graph/directed_cycle';
 
 // simple test set
 const a = new Cell('a', 1);
@@ -9,13 +10,12 @@ const cell_set_1 = [a, b, c];
 
 // random set
 const random_cell_set: Cell[] = [];
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 20; i++) {
     random_cell_set.push(new Cell('' + i, Math.random() * 100));
 }
 // create dependencies
 for (const cell of random_cell_set) {
-    // 0 - 3 dependencies
-    const numDepends = Math.floor(Math.random() * 3);
+    const numDepends = Math.floor(Math.random() * 2);
     for (let i = 0; i < numDepends; i++) {
         const idx = Math.floor(Math.random() * random_cell_set.length);
         cell.dependsOn.push(random_cell_set[idx]);
@@ -31,12 +31,15 @@ function logStats(calculator: CellsCalculator, cells: Cell[]) {
     console.log('calcs: ' + calculator.totalCalculations);
     console.log('converged: ' + calculator.converged);
     console.log('calc limit reached: ' + calculator.calculationLimitReached);
-    console.log('values:');
-    console.log(cells.map(cell => cell.value));
+    // console.log('values:');
+    // console.log(cells.map(cell => cell.value));
 }
 
 function runAllCalculators(calculators: CellsCalculator[], cells: Cell[]) {
     const cell_start_values = cells.map(cell => cell.value);
+    const containsCyle = CellsGrapher.containsCycle(CellsGrapher.createGraph(cells));
+    console.log('number of cells: ' + cells.length);
+    console.log('cell dependency cycle: ' + containsCyle);
     for (const key in calculators) {
         if (calculators.hasOwnProperty(key)) {
             // reset cell values for each calculator
@@ -57,9 +60,9 @@ const calcs = [];
 calcs['naive'] = new NaiveCalculator();
 calcs['topo'] = new TopoSortCalculator();
 
-console.log('##################');
-console.log('simple set:');
-runAllCalculators(calcs, cell_set_1);
+// console.log('##################');
+// console.log('simple set:');
+// runAllCalculators(calcs, cell_set_1);
 
 console.log('##################');
 console.log('random set:');
