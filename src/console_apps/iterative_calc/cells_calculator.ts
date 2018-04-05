@@ -79,7 +79,7 @@ export class TopoSortCalculator extends BaseCalculator implements CellsCalculato
         const cycleFinder = new DirectedCycle(cellsGraph);
         const order = cycleFinder.hasCycle()
             ? range(cells.length)
-            : Array.from(new TopoSort(cellsGraph).order()).reverse();
+            : Array.from(new TopoSort(cellsGraph).order());
 
         this.calculateInOrder(cells, order);
     }
