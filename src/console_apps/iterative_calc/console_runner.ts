@@ -84,6 +84,22 @@ class CellsGenerator {
         return [a, b, c];
     }
 
+    /** cells 0, 1, 2, ... n
+     *  dependencies 0 --> 1 --> 2 ... ---> n
+     *  Calculating in cell order should converge very slowly
+     */
+    public static reverseDeps(num_cells: number): Cell[] {
+        const cells: Cell[] = [];
+        for (let i = 0; i < num_cells; i++) {
+            cells.push(new Cell('' + i, Math.random() * 100));
+        }
+        for (let i = 0; i < num_cells - 1; i++) {
+            cells[i].dependsOn.push(cells[i + 1]);
+            cells[i].calculateValue = () => 0.9 * cells[i + 1].value;
+        }
+        return cells;
+    }
+
     /**
      * Create a set of cells with random values and formulas
      * @param numCells number of cells
@@ -116,6 +132,7 @@ const runner = new ConsoleRunner();
 runner.addCalculator('naive', new NaiveCalculator());
 runner.addCalculator('topo', new TopoSortCalculator());
 runner.addCellSet('simple', CellsGenerator.simpleSet());
+runner.addCellSet('reverse deps', CellsGenerator.reverseDeps(20));
 runner.addCellSet('random', CellsGenerator.createRandomCellSet(20, 2));
 
 runner.run();
