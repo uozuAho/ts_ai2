@@ -53,6 +53,26 @@ abstract class GraphBase {
         }
     }
 
+    protected remove_directed_edge(from: number, to: number) {
+        this.validate_idx(from);
+        this.validate_idx(to);
+        const adj = this._adj[from];
+        const edgeIdxs = [];
+        for (let i = 0; i < adj.length; i++) {
+            if (adj[i].to === to) {
+                edgeIdxs.push(i);
+            }
+        }
+        if (edgeIdxs.length === 0) {
+            throw new Error(`no edge from ${from} to ${to}`);
+        }
+        if (edgeIdxs.length > 1) {
+            throw new Error(`mulitple edges from ${from} to ${to}`);
+        }
+        const idx = edgeIdxs[0];
+        adj.splice(idx, 1);
+    }
+
     protected validate_idx(n: number): void {
         if (n < 0 || n >= this._num_nodes) { throw new Error('invalid index: ' + n); }
     }
@@ -67,6 +87,12 @@ export class Graph extends GraphBase implements IGraph {
         // add the return edge. Don't duplicate this yourself!!
         this.add_directed_edge(q, p, weight);
         this._num_edges++;
+    }
+
+    public remove_edge(from: number, to: number) {
+        this.remove_directed_edge(from, to);
+        this.remove_directed_edge(to, from);
+        this._num_edges--;
     }
 
     /** Return all undirected edges.
@@ -97,6 +123,11 @@ export class DiGraph extends GraphBase implements IGraph {
     public add_edge(p: number, q: number, weight: number = 1): void {
         this.add_directed_edge(p, q, weight);
         this._num_edges++;
+    }
+
+    public remove_edge(from: number, to: number) {
+        this.remove_directed_edge(from, to);
+        this._num_edges--;
     }
 
     public get_edges(): Edge[] {

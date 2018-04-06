@@ -40,6 +40,10 @@ class GraphBase<T> {
         this._graph.add_edge(p, q, weight);
     }
 
+    public remove_edge(from: number, to: number) {
+        this._graph.remove_edge(from, to);
+    }
+
     public add_edgeT(nodeFrom: T, nodeTo: T, cost: number = 1) {
         const idx_from = this._get_idx(nodeFrom);
         const idx_to = this._get_idx(nodeTo);
