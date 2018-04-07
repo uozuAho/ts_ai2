@@ -17,13 +17,17 @@ export class MetaDag {
     /** Convert a directed graph to a DAG by extracting all cycles to MetaNodes */
     constructor(graph: IGraph) {
         let tempGraph = graph;
+        let oldNodes = this.createMetaNodes(graph.num_nodes());
         let tempNodes = this.createMetaNodes(graph.num_nodes());
-        let oldNodes = tempNodes;
         let finder = new DirectedCycle(graph);
 
+        let loopCounter = 0;
         while (finder.hasCycle()) {
+            if (loopCounter++ > 1000) {
+                throw new Error('This has gone on long enough');
+            }
             const cycle = new Set(finder.getCycle());
-            tempNodes = this.replaceCycleWithMetaNode(tempGraph, tempNodes, cycle);
+            tempNodes = this.replaceCycleWithMetaNode(tempGraph, oldNodes, cycle);
 
             Assert.isTrue(tempNodes.length === oldNodes.length - cycle.size + 1,
                 'number of nodes should be reduced by number of nodes in cycle, +1 for added meta node');
@@ -48,11 +52,11 @@ export class MetaDag {
     /** create new MetaNode array: [{nodes not in cycle}, MetaNode(nodes in cycle)] */
     private replaceCycleWithMetaNode(graph: IGraph, nodes: MetaNode[], cycle: Set<number>): MetaNode[] {
         // extract all nodes (not meta nodes) in the cycle into a new MetaNode
-        const cycleNodes: number[] = [];
+        let cycleNodes: number[] = [];
         for (const idx of cycle) {
             const node = nodes[idx];
             if (node.isSet) {
-                node.nodes.forEach(n => cycleNodes.push(n));
+                cycleNodes = cycleNodes.concat(node.nodes);
             } else {
                 cycleNodes.push(node.node);
             }
@@ -80,8 +84,12 @@ export class MetaDag {
             }
             // Find the index of the old nodes in the new set.
             // If they're not in the new set, they're part of the cycle.
-            const fromIdx = newIdxMap.get(oldNodeFrom) || newNodes.length - 1;
-            const toIdx = newIdxMap.get(oldNodeTo) || newNodes.length - 1;
+            const getIdx = (node: MetaNode) => {
+                const idx = newIdxMap.get(node);
+                return idx === undefined ? newNodes.length - 1 : idx;
+            };
+            const fromIdx = getIdx(oldNodeFrom);
+            const toIdx = getIdx(oldNodeTo);
             newGraph.add_edge(fromIdx, toIdx);
         }
         return newGraph;
