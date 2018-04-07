@@ -37,7 +37,7 @@ describe('MetaDag', function() {
         expect(nodeSet.nodes.indexOf(1)).not.toBe(-1);
     });
 
-    it('2 graph, 2 nodes in cycle', function() {
+    it('4 graph, 2 nodes in cycle', function() {
         // 0 --> (1 <--> 2) --> 3
         const d = new DiGraph(4);
         d.add_edge(0, 1);
