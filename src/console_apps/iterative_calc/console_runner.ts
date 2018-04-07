@@ -1,5 +1,5 @@
-import { Cell } from './cell';
-import { NaiveCalculator, CellsCalculator, TopoSortCalculator, CellsGrapher } from './cells_calculator';
+import { Cell, CellsGraph } from './cell';
+import { NaiveCalculator, CellsCalculator, TopoSortCalculator } from './cells_calculator';
 import { DirectedCycle } from '../../ai_lib/algorithms/graph/directed_cycle';
 
 class ConsoleRunner {
@@ -13,7 +13,7 @@ class ConsoleRunner {
     public run() {
         for (const cellsLabel of this._cellSets.keys()) {
             const cells = this._cellSets.get(cellsLabel);
-            const containsCyle = CellsGrapher.containsCycle(CellsGrapher.createGraph(cells));
+            const containsCyle = CellsGraph.containsCycle(CellsGraph.create(cells));
             console.log('-----------------------------------');
             console.log('cell set: ' + cellsLabel);
             console.log('number of cells: ' + cells.length);
@@ -118,7 +118,7 @@ class CellsGenerator {
                 cell.dependsOn.push(cells[idx]);
             }
             if (numDepends > 0) {
-                const coeff = 1 / numDepends;
+                const coeff = 1.6 / numDepends;
                 // cell formula = (1 / num dependents) * sum (dependent values)
                 cell.calculateValue = () => coeff * cell.dependsOn.reduce((prev, curr) => prev + curr.value, 0);
             }
@@ -133,6 +133,6 @@ runner.addCalculator('naive', new NaiveCalculator());
 runner.addCalculator('topo', new TopoSortCalculator());
 runner.addCellSet('simple', CellsGenerator.simpleSet());
 runner.addCellSet('reverse deps', CellsGenerator.reverseDeps(20));
-runner.addCellSet('random', CellsGenerator.createRandomCellSet(20, 2));
+runner.addCellSet('random', CellsGenerator.createRandomCellSet(50, 2));
 
 runner.run();

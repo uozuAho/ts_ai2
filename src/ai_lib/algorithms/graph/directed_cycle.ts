@@ -92,11 +92,11 @@ export class DirectedCycle {
 
     /**
      * Returns a directed cycle if the digraph has a directed cycle, and [] otherwise.
+     * @returns array of node indexes in the cycle
      */
     public getCycle(): number[] {
         return this._cycle || [];
     }
-
 
     // certify that digraph has a directed cycle if it reports one
     private check() {

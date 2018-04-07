@@ -24,7 +24,5 @@ in the cycle is visited 3 times.
 
 
 # todo:
-- compare output values of each calculator (assert)
-- create some illustrative examples (eg. reverse topo order is bad)
 - create a calculator that does better than naive even when dependency
   cycles exist

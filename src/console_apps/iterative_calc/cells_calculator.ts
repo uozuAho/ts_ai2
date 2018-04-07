@@ -1,4 +1,4 @@
-import { Cell } from './cell';
+import { Cell, CellsGraph } from './cell';
 import { TopoSort } from '../../ai_lib/algorithms/graph/toposort';
 import { DiGraphT } from '../../ai_lib/structures/graphT';
 import { DirectedCycle } from '../../ai_lib/algorithms/graph/directed_cycle';
@@ -21,7 +21,7 @@ export interface CellsCalculator {
     calculate(cells: Cell[]);
 }
 
-class BaseCalculator {
+export class BaseCalculator {
     public numCalculations: number[];
     public totalCalculations = 0;
     public calculationLimitReached = false;
@@ -74,7 +74,7 @@ export class NaiveCalculator extends BaseCalculator implements CellsCalculator {
 export class TopoSortCalculator extends BaseCalculator implements CellsCalculator {
 
     public calculate(cells: Cell[]) {
-        const cellsGraph = CellsGrapher.createGraph(cells);
+        const cellsGraph = CellsGraph.create(cells);
 
         const cycleFinder = new DirectedCycle(cellsGraph);
         const order = cycleFinder.hasCycle()
@@ -82,25 +82,6 @@ export class TopoSortCalculator extends BaseCalculator implements CellsCalculato
             : Array.from(new TopoSort(cellsGraph).order());
 
         this.calculateInOrder(cells, order);
-    }
-}
-
-export class CellsGrapher {
-    public static createGraph(cells: Cell[]): DiGraphT<Cell> {
-        const cellsGraph = new DiGraphT<Cell>();
-        for (const cell of cells) {
-            cellsGraph.add_node(cell);
-        }
-        for (const cell of cells) {
-            for (const adj of cell.dependsOn) {
-                cellsGraph.add_edgeT(adj, cell);
-            }
-        }
-        return cellsGraph;
-    }
-
-    public static containsCycle(graph: DiGraphT<Cell>): boolean {
-        return new DirectedCycle(graph).hasCycle();
     }
 }
 
