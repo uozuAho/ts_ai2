@@ -54,32 +54,34 @@ export class DirectedCycle {
     }
 
     // check that algorithm computes either the topological order or finds a directed cycle
-    private dfs(G: IGraph, v: number) {
-        this.onStack[v] = true;
-        this.marked[v] = true;
-        for (const w of G.adjacent(v).map(e => e.other(v))) {
+    private dfs(G: IGraph, node: number) {
+        this.onStack[node] = true;
+        this.marked[node] = true;
+        for (const adj of G.adjacent(node).map(e => e.other(node))) {
 
             // short circuit if directed cycle found
             if (this._cycle != null) { return; }
 
             // found new vertex, so recur
-            else if (!this.marked[w]) {
-                this.edgeTo[w] = v;
-                this.dfs(G, w);
+            else if (!this.marked[adj]) {
+                this.edgeTo[adj] = node;
+                this.dfs(G, adj);
             }
 
-            // trace back directed cycle
-            else if (this.onStack[w]) {
+            // trace back directed cycle from end to start
+            else if (this.onStack[adj]) {
                 this._cycle = [];
-                for (let x = v; x !== w; x = this.edgeTo[x]) {
+                for (let x = node; x !== adj; x = this.edgeTo[x]) {
                     this._cycle.push(x);
                 }
-                this._cycle.push(w);
-                this._cycle.push(v);
+                this._cycle.push(adj);
+                this._cycle.push(node);
+                // reverse to get the correct cycle order
+                this._cycle.reverse();
                 this.check();
             }
         }
-        this.onStack[v] = false;
+        this.onStack[node] = false;
     }
 
     /**
