@@ -40,6 +40,16 @@ export class CycleCellsCalculator extends BaseCalculator implements CellsCalcula
         const numCalculations = new Map<Cell, number>();
         const prevValues = new Map<Cell, number>();
         const changes = new Map<Cell, number>();
+        // initialise change values to max to ensure convergence check isn't tripped early
+        for (const c of metaCells) {
+            if (c.isCycle) {
+                for (const mc of c.cycle.cells) {
+                    changes.set(mc, Number.MAX_VALUE);
+                }
+            } else {
+                changes.set(c.cell, Number.MAX_VALUE);
+            }
+        }
         let calcLimitReached = false;
 
         function addNumCalcs(cell: Cell, num: number): number {
