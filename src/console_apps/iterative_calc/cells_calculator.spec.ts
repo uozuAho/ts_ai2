@@ -1,33 +1,10 @@
 import { Cell } from './cell';
 import { NaiveCalculator, TopoSortCalculator } from './cells_calculator';
-
-/** 3 cells, cell i + 1 depends on i. 'calculate' sets cell value to zero */
-function createSimpleCells(): Cell[] {
-    const cells: Cell[] = [
-        new Cell('a', 1, [], () => 0),
-        new Cell('b', 1),
-        new Cell('c', 1)
-    ];
-    for (let i = 1; i < cells.length; i++) {
-        // each cell depends on the cell before it
-        cells[i].dependsOn = [cells[i - 1]];
-        // 'calculate': set cell value to zero
-        cells[i].calculateValue = () => 0;
-    }
-    return cells;
-}
-
-/** 1 cell, calculate => incrementing value so will never converge */
-function createDivergentCells(): Cell[] {
-    let i = 0;
-    return [
-        new Cell('a', 0, [], () => ++i)
-    ];
-}
+import { CellsGenerator } from './cells_generator';
 
 describe('NaiveCalculator', function() {
-    it('simple cells', function() {
-        const cells = createSimpleCells();
+    it('3 linear cells', function() {
+        const cells = CellsGenerator.threeCellsLinearDepEqualsZero();
         const calc = new NaiveCalculator();
 
         const results = calc.calculate(cells);
@@ -39,8 +16,8 @@ describe('NaiveCalculator', function() {
         expect(results.totalCalculations).toBe(6);
     });
 
-    it('divergent cells', function() {
-        const cells = createDivergentCells();
+    it('divergent cell', function() {
+        const cells = CellsGenerator.singleDivergentCell();
         const calcLimit = 20;
         const calc = new NaiveCalculator(calcLimit);
 
@@ -53,8 +30,8 @@ describe('NaiveCalculator', function() {
 });
 
 describe('TopoCalculator', function() {
-    it('simple cells', function() {
-        const cells = createSimpleCells();
+    it('3 linear cells', function() {
+        const cells = CellsGenerator.threeCellsLinearDepEqualsZero();
         const calc = new TopoSortCalculator();
 
         const results = calc.calculate(cells);
@@ -67,8 +44,8 @@ describe('TopoCalculator', function() {
         expect(results.totalCalculations).toBe(6);
     });
 
-    it('divergent cells', function() {
-        const cells = createDivergentCells();
+    it('divergent cell', function() {
+        const cells = CellsGenerator.singleDivergentCell();
         const calcLimit = 20;
         const calc = new TopoSortCalculator(calcLimit);
 

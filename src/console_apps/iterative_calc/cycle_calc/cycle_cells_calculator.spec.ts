@@ -1,33 +1,10 @@
 import { Cell } from '../cell';
 import { CycleCellsCalculator } from './cycle_cells_calculator';
-
-/** 3 cells, cell i + 1 depends on i. 'calculate' sets cell value to zero */
-function createSimpleCells(): Cell[] {
-    const cells: Cell[] = [
-        new Cell('a', 1, [], () => 0),
-        new Cell('b', 1),
-        new Cell('c', 1)
-    ];
-    for (let i = 1; i < cells.length; i++) {
-        // each cell depends on the cell before it
-        cells[i].dependsOn = [cells[i - 1]];
-        // 'calculate': set cell value to zero
-        cells[i].calculateValue = () => 0;
-    }
-    return cells;
-}
-
-/** 1 cell, calculate => incrementing value so will never converge */
-function createDivergentCells(): Cell[] {
-    let i = 0;
-    return [
-        new Cell('a', 0, [], () => ++i)
-    ];
-}
+import { CellsGenerator } from '../cells_generator';
 
 describe('CycleCellsCalculator', function() {
     it('simple', function() {
-        const cells = createSimpleCells();
+        const cells = CellsGenerator.threeCellsLinearDepEqualsZero();
         const calc = new CycleCellsCalculator();
 
         const results = calc.calculate(cells);
@@ -37,5 +14,37 @@ describe('CycleCellsCalculator', function() {
         // first run through sets all cells with dependencies to 0
         // no values change in the second run, so calculation terminates after 2 sets
         expect(results.totalCalculations).toBe(6);
+    });
+
+    it('simple cycle', function() {
+        const cells = CellsGenerator.threeCellsLinearDepEqualsZeroCycle();
+        const calc = new CycleCellsCalculator();
+
+        const results = calc.calculate(cells);
+
+        // should break cycle and get same results as 3 cells with no cycle
+        expect(results.calculationLimitReached).toBe(false);
+        expect(results.converged).toBe(true);
+        expect(results.totalCalculations).toBe(6);
+    });
+
+    it('divergent cell', function() {
+        const cells = CellsGenerator.singleDivergentCell();
+        const calc = new CycleCellsCalculator();
+
+        const results = calc.calculate(cells);
+
+        expect(results.calculationLimitReached).toBe(true);
+        expect(results.converged).toBe(false);
+    });
+
+    it('divergent cycle', function() {
+        const cells = CellsGenerator.divergentCycle();
+        const calc = new CycleCellsCalculator();
+
+        const results = calc.calculate(cells);
+
+        expect(results.calculationLimitReached).toBe(true);
+        expect(results.converged).toBe(false);
     });
 });
