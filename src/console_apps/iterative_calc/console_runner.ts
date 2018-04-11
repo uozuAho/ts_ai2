@@ -1,5 +1,5 @@
 import { Cell, CellsGraph } from './cell';
-import { NaiveCalculator, CellsCalculator, TopoSortCalculator } from './cells_calculator';
+import { NaiveCalculator, CellsCalculator, TopoSortCalculator, CalculationResults } from './cells_calculator';
 import { DirectedCycle } from '../../ai_lib/algorithms/graph/directed_cycle';
 
 class ConsoleRunner {
@@ -22,16 +22,16 @@ class ConsoleRunner {
             for (const calcLabel of this._calculators.keys()) {
                 this.resetCellValues(cellsLabel);
                 const calculator = this._calculators.get(calcLabel);
-                calculator.calculate(cells);
+                const results = calculator.calculate(cells);
                 console.log('calculator: ' + calcLabel);
-                this.logStats(calculator, cells);
+                this.logStats(results, cells);
                 if (firstCalcValues === undefined) {
-                    if (calculator.converged) {
+                    if (results.converged) {
                         // only treat converged calculated cells' values as valid
                         firstCalcValues = cells.map(c => c.value);
                     }
                 } else {
-                    if (calculator.converged) {
+                    if (results.converged) {
                         const thisVals = cells.map(c => c.value);
                         this.logCellsNotWithinTolerance(firstCalcValues, thisVals);
                     }
@@ -50,10 +50,10 @@ class ConsoleRunner {
         this._cellInitialValues.set(label, cells.map(c => c.value));
     }
 
-    private logStats(calculator: CellsCalculator, cells: Cell[]) {
-        console.log('calcs: ' + calculator.totalCalculations);
-        console.log('converged: ' + calculator.converged);
-        console.log('calc limit reached: ' + calculator.calculationLimitReached);
+    private logStats(results: CalculationResults, cells: Cell[]) {
+        console.log('calcs: ' + results.totalCalculations);
+        console.log('converged: ' + results.converged);
+        console.log('calc limit reached: ' + results.calculationLimitReached);
     }
 
     private resetCellValues(label: string) {
