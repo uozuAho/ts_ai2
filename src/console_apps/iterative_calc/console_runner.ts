@@ -1,6 +1,7 @@
 import { Cell, CellsGraph } from './cell';
 import { NaiveCalculator, CellsCalculator, TopoSortCalculator, CalculationResults } from './cells_calculator';
 import { DirectedCycle } from '../../ai_lib/algorithms/graph/directed_cycle';
+import { CycleCellsCalculator } from './cycle_calc/cycle_cells_calculator';
 
 class ConsoleRunner {
 
@@ -131,6 +132,7 @@ const runner = new ConsoleRunner();
 
 runner.addCalculator('naive', new NaiveCalculator());
 runner.addCalculator('topo', new TopoSortCalculator());
+runner.addCalculator('cycle', new CycleCellsCalculator());
 runner.addCellSet('simple', CellsGenerator.simpleSet());
 runner.addCellSet('reverse deps', CellsGenerator.reverseDeps(20));
 runner.addCellSet('random', CellsGenerator.createRandomCellSet(50, 2));

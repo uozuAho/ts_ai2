@@ -24,7 +24,7 @@ export class MetaDag {
         let loopCounter = 0;
         while (finder.hasCycle()) {
             if (loopCounter++ > 1000) {
-                throw new Error('This has gone on long enough');
+                throw new Error('Cycle exist after 1000 edge cuts - this is probably wrong');
             }
             const cycle = new Set(finder.getCycle());
             tempNodes = this.replaceCycleWithMetaNode(tempGraph, oldNodes, cycle);
