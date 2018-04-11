@@ -49,11 +49,11 @@ export class CycleCellsCalculator extends BaseCalculator implements CellsCalcula
             return newValue;
         }
 
-        let asdf = 0;
+        let loopCounter = 0;
         // todo: allchanges never below - -- changes not updated?
         while (!calcLimitReached && !this.allChangesBelowThreshold(changes)) {
-            if (asdf++ > 1000) {
-                throw new Error('mij');
+            if (loopCounter++ > 1000) {
+                throw new Error('infinite loop detected');
             }
             for (let i = 0; i < metaCells.length; i++) {
                 const metaCell = metaCells[i];
