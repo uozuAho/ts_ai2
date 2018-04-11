@@ -20,7 +20,7 @@ export class CycleCellsCalculator extends BaseCalculator implements CellsCalcula
         const numCalcs = cells.map(c => numCalcsMap.get(c));
         let converged = true;
         for (const calcs of numCalcs) {
-            if (calcs === this.calculationLimit) {
+            if (calcs >= this.calculationLimit) {
                 converged = false;
                 break;
             }
@@ -39,17 +39,7 @@ export class CycleCellsCalculator extends BaseCalculator implements CellsCalcula
     private calculateInMetaOrder(metaCells: MetaCell[]): Map<Cell, number> {
         const numCalculations = new Map<Cell, number>();
         const prevValues = new Map<Cell, number>();
-        const changes = new Map<Cell, number>();
-        // initialise change values to max to ensure convergence check isn't tripped early
-        for (const c of metaCells) {
-            if (c.isCycle) {
-                for (const mc of c.cycle.cells) {
-                    changes.set(mc, Number.MAX_VALUE);
-                }
-            } else {
-                changes.set(c.cell, Number.MAX_VALUE);
-            }
-        }
+        const changes = Array(metaCells.length).fill(Number.MAX_VALUE);
         let calcLimitReached = false;
 
         function addNumCalcs(cell: Cell, num: number): number {
@@ -59,7 +49,12 @@ export class CycleCellsCalculator extends BaseCalculator implements CellsCalcula
             return newValue;
         }
 
-        while (!calcLimitReached && !this.allChangesBelowThreshold(Array.from(changes.values()))) {
+        let asdf = 0;
+        // todo: allchanges never below - -- changes not updated?
+        while (!calcLimitReached && !this.allChangesBelowThreshold(changes)) {
+            if (asdf++ > 1000) {
+                throw new Error('mij');
+            }
             for (let i = 0; i < metaCells.length; i++) {
                 const metaCell = metaCells[i];
                 if (!metaCell.isCycle) {
@@ -68,7 +63,7 @@ export class CycleCellsCalculator extends BaseCalculator implements CellsCalcula
                     const prevValue = cell.value;
                     prevValues.set(cell, prevValue);
                     const value = cell.calculate();
-                    changes.set(cell, value - prevValue);
+                    changes[i] = value - prevValue;
                     const numCalcs = addNumCalcs(cell, 1);
                     if (numCalcs === this.calculationLimit) {
                         calcLimitReached = true;
@@ -82,13 +77,17 @@ export class CycleCellsCalculator extends BaseCalculator implements CellsCalcula
                     // convergence, so may have been calculated > 1 times.
                     for (let j = 0; j < cycle.cells.length; j++) {
                         const cell = cycle.cells[j];
-                        addNumCalcs(cell, results.numCalculations[j]);
+                        const numCalcs = addNumCalcs(cell, results.numCalculations[j]);
+                        if (numCalcs > this.calculationLimit) {
+                            calcLimitReached = true;
+                        }
                     }
-                    // Don't need to track cell changes in a cycle, since the cycle
-                    // does that for us. Just check if the calculation limit was reached.
-                    if (results.calculationLimitReached) {
-                        calcLimitReached = true;
-                    }
+                    // hack: don't track all changes in the cycle, since
+                    // the cycle does that for us. If the cycle converged,
+                    // set the change for its metacell to zero, otherwise
+                    // set a large value. This allows easy reuse of
+                    // allChangesBelowThreshold
+                    changes[i] = results.converged ? 0 : Number.MAX_VALUE;
                 }
             }
         }
