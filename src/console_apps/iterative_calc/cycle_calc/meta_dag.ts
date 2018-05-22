@@ -5,7 +5,8 @@ import { Assert } from '../../../libs/assert/Assert';
 import { DiGraph } from '../../../ai_lib/structures/graph';
 
 /** Represents a DAG of any directed graph, where cycles have been converted
- *  to 'meta nodes', which house all nodes in the cycle.
+ *  to 'meta nodes', which house all nodes in the cycle. Note that edges
+ *  within cycles are not conserved.
  */
 export class MetaDag {
 
@@ -37,7 +38,7 @@ export class MetaDag {
             Assert.isTrue(tempNodes.length === oldNodes.length - cycle.size + 1,
                 'number of nodes should be reduced by number of nodes in cycle, +1 for added meta node');
 
-            tempGraph = this.rebuildGraph(graph, oldNodes, tempNodes);
+            tempGraph = MetaDag.rebuildGraph(graph, oldNodes, tempNodes);
             oldNodes = tempNodes;
             finder = new DirectedCycle(tempGraph);
         }
@@ -70,9 +71,15 @@ export class MetaDag {
         return nodes.filter((n, idx) => !cycle.has(idx)).concat(newMeta);
     }
 
-    // expects the new meta node to be at the end of newNodes
-    private rebuildGraph(graph: IGraph, oldNodes: MetaNode[], newNodes: MetaNode[]) {
-        // map new nodes to array indexes
+    /** Rebuild a graph whose nodes have changed. Nodes may have been moved and/or
+     *  grouped into single node sets. Edges within node sets are not replaced, however
+     *  edges to/from sets are maintained.
+     * @param graph:    The old graph
+     * @param oldNodes: The nodes corresponding to the old graph
+     * @param newNodes: The new nodes.
+     */
+    public static rebuildGraph(graph: IGraph, oldNodes: MetaNode[], newNodes: MetaNode[]) {
+        // map of new nodes to array indexes
         const newIdxMap = new Map<MetaNode, number>();
         newNodes.forEach((node, idx) => newIdxMap.set(node, idx));
 

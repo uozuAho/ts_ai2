@@ -4,6 +4,10 @@ import { CycleOrderer } from './cycle_orderer';
 import { IGraph } from '../../../ai_lib/structures/igraph';
 import { DiGraph } from '../../../ai_lib/structures/graph';
 
+/** A set of cells that form a simple or non-simple cycle
+ *  todo: (probably). Rename this to StrongComponent or similar:
+ *  https://en.wikipedia.org/wiki/Strongly_connected_component
+ */
 export class CellCycle extends BaseCalculator {
 
     private _order: number[];

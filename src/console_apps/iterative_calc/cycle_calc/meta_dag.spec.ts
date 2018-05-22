@@ -1,5 +1,7 @@
 import { DiGraph } from '../../../ai_lib/structures/graph';
 import { MetaDag } from './meta_dag';
+import { MetaNode } from './meta_node';
+import { Edge } from '../../../ai_lib/structures/igraph';
 
 describe('MetaDag', function() {
     it('no edges', function() {
@@ -81,36 +83,45 @@ describe('MetaDag', function() {
         expect(nodeSet.nodes.indexOf(3)).not.toBe(-1);
     });
 
-    it('asdf', function() {
-        const d = new DiGraph(50);
-        d.add_edge(6, 7);
-        d.add_edge(7, 31);
-        d.add_edge(8, 5);
-        d.add_edge(8, 20);
-        d.add_edge(9, 22);
-        d.add_edge(10, 8);
-        d.add_edge(10, 45);
-        d.add_edge(11, 11);
-        d.add_edge(14, 25);
-        d.add_edge(14, 30);
-        d.add_edge(16, 10);
-        d.add_edge(18, 40);
-        d.add_edge(19, 19);
-        d.add_edge(19, 33);
-        d.add_edge(21, 15);
-        d.add_edge(24, 12);
-        d.add_edge(28, 21);
-        d.add_edge(28, 32);
-        d.add_edge(31, 28);
-        d.add_edge(31, 47);
-        d.add_edge(34, 41);
-        d.add_edge(35, 34);
-        d.add_edge(37, 9);
-        d.add_edge(39, 37);
-        d.add_edge(40, 36);
-        d.add_edge(40, 49);
-        d.add_edge(43, 17);
-        d.add_edge(48, 0);
+    it('self loop', function() {
+        const d = new DiGraph(3);
+        d.add_edge(0, 0);
+        d.add_edge(0, 1);
+
+        d.add_edge(2, 2);
         const md = new MetaDag(d);
+    });
+
+    it('rebuild graph: same', function() {
+        const g1 = new DiGraph(3);
+        g1.add_edge(0, 1);
+        g1.add_edge(1, 2);
+        const nodes = [
+            new MetaNode(false, 0, null),
+            new MetaNode(false, 1, null),
+            new MetaNode(false, 2, null)
+        ];
+        const g2 = MetaDag.rebuildGraph(g1, nodes, nodes);
+        expect(g1.num_nodes()).toBe(g2.num_nodes());
+        expect(g1.get_edges()).toEqual(g2.get_edges());
+    });
+
+    it('rebuild graph: reorder', function() {
+        const g1 = new DiGraph(3);
+        g1.add_edge(0, 1);
+        g1.add_edge(1, 2);
+        const oldNodes = [
+            new MetaNode(false, 0, null),
+            new MetaNode(false, 1, null),
+            new MetaNode(false, 2, null)
+        ];
+        const newNodes = [oldNodes[1], oldNodes[2], oldNodes[0]];
+        const g2 = MetaDag.rebuildGraph(g1, oldNodes, newNodes);
+        expect(g1.num_nodes()).toBe(g2.num_nodes());
+        expect(g1.num_edges()).toBe(g2.num_edges());
+        let edges = g2.get_edges().filter(e => e.from === 1 && e.to === 2);
+        expect(edges.length).toBe(1);
+        edges = g2.get_edges().filter(e => e.from === 2 && e.to === 0);
+        expect(edges.length).toBe(1);
     });
 });
