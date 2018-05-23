@@ -1,5 +1,5 @@
-import { DiGraph } from '../../structures/graph';
 import { DirectedDFS } from './directed_dfs';
+import { IGraph } from '../../structures/igraph';
 
 /**
  * Copied from https://algs4.cs.princeton.edu/code/edu/princeton/cs/algs4/TransitiveClosure.java.html
@@ -31,7 +31,7 @@ export class TransitiveClosure {
      * Computes the transitive closure of the digraph G.
      * @param G the digraph
      */
-    constructor(G: DiGraph) {
+    constructor(G: IGraph) {
         this._tc = [];
         for (let v = 0; v < G.num_nodes(); v++) {
             this._tc.push(new DirectedDFS(G, v));

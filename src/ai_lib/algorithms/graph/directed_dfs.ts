@@ -1,4 +1,4 @@
-import { DiGraph } from '../../structures/graph';
+import { IGraph } from '../../structures/igraph';
 
 /**
  * Copied from https://algs4.cs.princeton.edu/code/edu/princeton/cs/algs4/DirectedDFS.java.html
@@ -33,7 +33,7 @@ export class DirectedDFS {
      * @param s the source vertex
      * @throws IllegalArgumentException unless {@code 0 <= s < V}
      */
-    constructor(G: DiGraph, s: number) {
+    constructor(G: IGraph, s: number) {
         this._marked = Array(G.num_nodes()).fill(false);
         this.validateVertex(s);
         this.dfs(G, s);
@@ -55,7 +55,7 @@ export class DirectedDFS {
     //     }
     // }
 
-    private dfs(G: DiGraph, v: number) {
+    private dfs(G: IGraph, v: number) {
         this._count++;
         this._marked[v] = true;
         for (const w of G.adjacent(v).map(e => e.other(v))) {

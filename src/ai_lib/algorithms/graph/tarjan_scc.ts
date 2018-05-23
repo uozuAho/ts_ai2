@@ -1,6 +1,6 @@
-import { DiGraph } from './../../structures/graph';
 import { Assert } from '../../../libs/assert/Assert';
 import { TransitiveClosure } from './transitive_closure';
+import { IGraph } from '../../structures/igraph';
 
 /**
  * Copied from https://algs4.cs.princeton.edu/code/edu/princeton/cs/algs4/TarjanSCC.java.html
@@ -52,7 +52,7 @@ export class TarjanSCC {
      * Computes the strong components of the digraph G.
      * @param G the digraph
      */
-    constructor(G: DiGraph) {
+    constructor(G: IGraph) {
         this._marked = Array(G.num_nodes()).fill(false);
         this._stack = [];
         this._id = Array(G.num_nodes()).fill(0);
@@ -67,7 +67,7 @@ export class TarjanSCC {
         Assert.isTrue(this.check(G));
     }
 
-    private dfs(G: DiGraph, v: number): void {
+    private dfs(G: IGraph, v: number): void {
         this._marked[v] = true;
         this._low[v] = this._pre++;
         let min = this._low[v];
@@ -124,7 +124,7 @@ export class TarjanSCC {
     }
 
     // does the id[] array contain the strongly connected components?
-    private check(G: DiGraph): boolean {
+    private check(G: IGraph): boolean {
         const tc = new TransitiveClosure(G);
         for (let v = 0; v < G.num_nodes(); v++) {
             for (let w = 0; w < G.num_nodes(); w++) {
