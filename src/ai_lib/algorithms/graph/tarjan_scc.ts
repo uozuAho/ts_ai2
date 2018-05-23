@@ -43,9 +43,9 @@ export class TarjanSCC {
     // low[v] = low number of v
     private _low: number[];
     // preorder number counter
-    private _pre: number;
+    private _pre = 0;
     // number of strongly-connected components
-    private _count: number;
+    private _count = 0;
     private _stack: number[];
 
     /**

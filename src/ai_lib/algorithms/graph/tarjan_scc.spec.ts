@@ -1,11 +1,11 @@
 import { DiGraph } from '../../structures/graph';
 import { TarjanSCC } from './tarjan_scc';
 
-describe('TransitiveClosure', function() {
+describe('TarjanSCC', function() {
     it('disconnected 2 graph', function() {
         const g = new DiGraph(2);
         const scc = new TarjanSCC(g);
-        expect(scc.count()).toBe(0);
+        expect(scc.count()).toBe(2);
     });
 
     it('connected 3 graph', function() {
@@ -13,7 +13,7 @@ describe('TransitiveClosure', function() {
         g.add_edge(0, 1);
         g.add_edge(1, 2);
         const scc = new TarjanSCC(g);
-        expect(scc.count()).toBe(0);
+        expect(scc.count()).toBe(3);
     });
 
     it('strongly connected 3 graph', function() {
