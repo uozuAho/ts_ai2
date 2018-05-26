@@ -83,14 +83,14 @@ describe('MetaDag', function() {
         expect(nodeSet.nodes.indexOf(3)).not.toBe(-1);
     });
 
-    it('self loop', function() {
-        const d = new DiGraph(3);
-        d.add_edge(0, 0);
-        d.add_edge(0, 1);
+    // it('self loop', function() {
+    //     const d = new DiGraph(3);
+    //     d.add_edge(0, 0);
+    //     d.add_edge(0, 1);
 
-        d.add_edge(2, 2);
-        const md = new MetaDag(d);
-    });
+    //     d.add_edge(2, 2);
+    //     const md = new MetaDag(d);
+    // });
 
     it('rebuild graph: same', function() {
         const g1 = new DiGraph(3);
@@ -106,22 +106,22 @@ describe('MetaDag', function() {
         expect(g1.get_edges()).toEqual(g2.get_edges());
     });
 
-    it('rebuild graph: reorder', function() {
-        const g1 = new DiGraph(3);
-        g1.add_edge(0, 1);
-        g1.add_edge(1, 2);
-        const oldNodes = [
-            new MetaNode(false, 0, null),
-            new MetaNode(false, 1, null),
-            new MetaNode(false, 2, null)
-        ];
-        const newNodes = [oldNodes[1], oldNodes[2], oldNodes[0]];
-        const g2 = MetaDag.rebuildGraph(g1, oldNodes, newNodes);
-        expect(g1.num_nodes()).toBe(g2.num_nodes());
-        expect(g1.num_edges()).toBe(g2.num_edges());
-        let edges = g2.get_edges().filter(e => e.from === 1 && e.to === 2);
-        expect(edges.length).toBe(1);
-        edges = g2.get_edges().filter(e => e.from === 2 && e.to === 0);
-        expect(edges.length).toBe(1);
-    });
+    // it('rebuild graph: reorder', function() {
+    //     const g1 = new DiGraph(3);
+    //     g1.add_edge(0, 1);
+    //     g1.add_edge(1, 2);
+    //     const oldNodes = [
+    //         new MetaNode(false, 0, null),
+    //         new MetaNode(false, 1, null),
+    //         new MetaNode(false, 2, null)
+    //     ];
+    //     const newNodes = [oldNodes[1], oldNodes[2], oldNodes[0]];
+    //     const g2 = MetaDag.rebuildGraph(g1, oldNodes, newNodes);
+    //     expect(g1.num_nodes()).toBe(g2.num_nodes());
+    //     expect(g1.num_edges()).toBe(g2.num_edges());
+    //     let edges = g2.get_edges().filter(e => e.from === 1 && e.to === 2);
+    //     expect(edges.length).toBe(1);
+    //     edges = g2.get_edges().filter(e => e.from === 2 && e.to === 0);
+    //     expect(edges.length).toBe(1);
+    // });
 });
