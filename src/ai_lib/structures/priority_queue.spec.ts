@@ -7,8 +7,8 @@ describe('PriorityQueue', function() {
         numberQueue = new PriorityQueue();
     });
 
-    it('pop empty should be undefined', function() {
-        expect(numberQueue.pop()).toBe(undefined);
+    it('pop empty should throw', function() {
+        expect(() => numberQueue.pop()).toThrow();
     });
 
     it('pop in correct order', function() {

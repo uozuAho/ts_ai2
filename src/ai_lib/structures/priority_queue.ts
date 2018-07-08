@@ -1,13 +1,11 @@
-import * as TinyQueue from 'tinyqueue';
+import { BinaryHeap } from './binary_heap';
 
 /** Priority queue. Defaults to min-priority queue, but this can be
  *  changed by passing a compare function to the constructor.
  */
 export class PriorityQueue<T> {
 
-    // just a typed wrapper around TinyQueue
-    private _tinyqueue: any;
-    private _compare: (a: T, b: T) => number;
+    private _heap: BinaryHeap<T>;
 
     /**
      * @param data existing data
@@ -18,18 +16,20 @@ export class PriorityQueue<T> {
      */
     constructor(data: T[] = [], compare: (a: T, b: T) => number = null) {
         if (compare !== null) {
-            this._tinyqueue = new TinyQueue(data, compare);
+            this._heap = new BinaryHeap(compare);
         } else {
-            this._tinyqueue = new TinyQueue(data);
+            this._heap = new BinaryHeap();
         }
-        this._compare = compare;
+        for (const item of data) {
+            this._heap.add(item);
+        }
     }
 
     public push(item: T): void {
-        this._tinyqueue.push(item);
+        this._heap.add(item);
     }
 
     public pop(): T {
-        return this._tinyqueue.pop();
+        return this._heap.removeMin();
     }
 }
