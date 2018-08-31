@@ -33,7 +33,9 @@ export class SccComponent {
     const scc = new TarjanSCC(graph);
     const interestingNodes = this.getInterestingNodes(graph, scc);
     for (const n of interestingNodes) {
-      nodes.push(oldNodes[n]);
+      const asdf = oldNodes[n];
+      asdf.group = scc.id(n);
+      nodes.push(asdf);
     }
     for (const e of graph.get_edges()) {
       if (interestingNodes.has(e.from) && interestingNodes.has(e.to)) {
