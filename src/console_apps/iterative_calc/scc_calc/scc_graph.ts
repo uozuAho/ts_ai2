@@ -32,6 +32,7 @@ export class SccGraph implements IGraph {
         }
     }
 
+    /** Get the nodes of the input graph that form the given scc node */
     public sourceNodes(n: number): number[] {
         return this._sourceNodes[n];
     }
