@@ -34,6 +34,10 @@ export class SccCellsCalculator extends BaseCalculator implements CellsCalculato
                 // just calculate in node order
                 // todo: calculate in topo order after removing edges
                 const sccResult = this.calculateInOrder(source_cells, [...Array(source_cells.length).keys()]);
+                for (let i = 0; i < source_idxs.length; i++) {
+                    const source_idx = source_idxs[i];
+                    results.numCalculations[source_idx] = sccResult.numCalculations[i];
+                }
                 results.totalCalculations += sccResult.totalCalculations;
                 if (!results.calculationLimitReached) {
                     results.calculationLimitReached = sccResult.calculationLimitReached;
