@@ -2,6 +2,7 @@ import { Cell, CellsGraph } from './cell';
 import { NaiveCalculator, CellsCalculator, TopoSortCalculator, CalculationResults } from './cells_calculator';
 import { DirectedCycle } from '../../ai_lib/algorithms/graph/directed_cycle';
 import { CycleCellsCalculator } from './cycle_calc/cycle_cells_calculator';
+import { SccCellsCalculator } from './scc_calc/scc_cells_calculator';
 
 class ConsoleRunner {
 
@@ -23,19 +24,23 @@ class ConsoleRunner {
             for (const calcLabel of this._calculators.keys()) {
                 this.resetCellValues(cellsLabel);
                 const calculator = this._calculators.get(calcLabel);
-                const results = calculator.calculate(cells);
-                console.log('calculator: ' + calcLabel);
-                this.logStats(results, cells);
-                if (firstCalcValues === undefined) {
-                    if (results.converged) {
-                        // only treat converged calculated cells' values as valid
-                        firstCalcValues = cells.map(c => c.value);
+                try {
+                    const results = calculator.calculate(cells);
+                    console.log('calculator: ' + calcLabel);
+                    this.logStats(results, cells);
+                    if (firstCalcValues === undefined) {
+                        if (results.converged) {
+                            // only treat converged calculated cells' values as valid
+                            firstCalcValues = cells.map(c => c.value);
+                        }
+                    } else {
+                        if (results.converged) {
+                            const thisVals = cells.map(c => c.value);
+                            this.logCellsNotWithinTolerance(firstCalcValues, thisVals);
+                        }
                     }
-                } else {
-                    if (results.converged) {
-                        const thisVals = cells.map(c => c.value);
-                        this.logCellsNotWithinTolerance(firstCalcValues, thisVals);
-                    }
+                } catch (error) {
+                    console.log(`error while running ${calcLabel}: ${error}`);
                 }
                 console.log('');
             }
@@ -70,7 +75,7 @@ class ConsoleRunner {
         for (let i = 0; i < vals1.length; i++) {
             const val1 = vals1[i];
             const val2 = vals2[i];
-            if (Math.abs(val1 - val2) > 1e-3) {
+            if (Math.abs(val1 - val2) > 1e-10) {
                 console.log(`cells at index ${i} differ: ${val1} != ${val2}`);
             }
         }
@@ -130,9 +135,10 @@ class CellsGenerator {
 
 const runner = new ConsoleRunner();
 
-runner.addCalculator('naive', new NaiveCalculator());
+// runner.addCalculator('naive', new NaiveCalculator());
 runner.addCalculator('topo', new TopoSortCalculator());
 runner.addCalculator('cycle', new CycleCellsCalculator());
+runner.addCalculator('scc', new SccCellsCalculator());
 runner.addCellSet('simple', CellsGenerator.simpleSet());
 runner.addCellSet('reverse deps', CellsGenerator.reverseDeps(20));
 runner.addCellSet('random', CellsGenerator.createRandomCellSet(50, 2));
