@@ -3,8 +3,8 @@ import { DiGraphT } from '../../../ai_lib/structures/graphT';
 import { GraphEditorComponent } from '../../shared/graph-editor/graph-editor.component';
 import { VisNode } from '../../../libs/vis_wrappers/vis_network';
 import { TopoSort } from '../../../ai_lib/algorithms/graph/toposort';
-import { DirectedCycle } from '../../../ai_lib/algorithms/graph/directed_cycle';
-import { Assert } from '../../../libs/assert/Assert';
+import { TarjanSCC } from '../../../ai_lib/algorithms/graph/tarjan_scc';
+import { CycleOrderer } from './cycle_orderer';
 
 @Component({
   selector: 'app-toposort',
@@ -78,7 +78,7 @@ export class ToposortComponent {
           if (this._topoSort.hasOrder()) {
             return this.showTopoOrderState;
           } else {
-            return this.showCycleState;
+            return this.showSccOrderState;
           }
         }
         default: return this._currentState;
@@ -88,7 +88,7 @@ export class ToposortComponent {
 
   private showTopoOrderState = new AlgViewerState(
     () => {
-      this.currentStepText = 'Here\'s your order mister';
+      this.currentStepText = 'Colouring nodes in topological order';
       this.nextButtonText = 'Next';
       let idx = 0;
       const order = Array.from(this._topoSort.order());
@@ -111,25 +111,33 @@ export class ToposortComponent {
     () => clearInterval(this.showTopoOrderState.data.timer)
   );
 
-  private showCycleState = new AlgViewerState(
+  private showSccOrderState = new AlgViewerState(
     () => {
-      this.currentStepText = 'Cannot order - contains a cycle. One cycle shown.';
-      const cycle = new DirectedCycle(this._originalGraph).getCycle();
-      Assert.isTrue(cycle.length > 0);
-      const nodes = this._originalGraph.get_nodes();
-      // colour in cycle nodes
-      for (const idx of cycle) {
-        this._graphEditor.editNode(nodes[idx].id, n => n.color = 'red');
-      }
+      this.currentStepText = `Showing 'scc' order. Note that this orders strongly-connected components
+                              (SCC) in topological order. Since a directed graph with cycles has no
+                              topological order, SCCs are treated as a special case. In this case, they
+                              are repeated twice per complete node ordering.`;
+      // get order
+      const graph = this._graphEditor.getDiGraph();
+      const sccOrder = new CycleOrderer(graph);
+      const order = Array.from(sccOrder.order());
+
+      // show order
+      let idx = 0;
+      const nodes = graph.get_nodes();
+      this.showTopoOrderState.data.timer = setInterval(() => {
+        const prevIdx = idx;
+        if (++idx === order.length) { idx = 0; }
+        this._graphEditor.editNode(nodes[order[prevIdx]].id, n => n.color = 'blue');
+        this._graphEditor.editNode(nodes[order[idx]].id, n => n.color = 'red');
+      }, 300);
     },
     input => {
       switch (input) {
-        case StateInput.Next: {
-          return this._currentState;
-        }
         default: return this._currentState;
       }
     },
+    () => clearInterval(this.showTopoOrderState.data.timer)
   );
 }
 

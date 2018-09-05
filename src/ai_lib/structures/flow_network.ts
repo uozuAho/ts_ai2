@@ -69,6 +69,10 @@ export class FlowNetwork implements IGraph {
         this.add_flow_edge(new FlowEdge(p, q, weight));
     }
 
+    public remove_edge(from: number, to: number) {
+        throw new Error('Method not implemented.');
+    }
+
     /**
      * Returns the edges incident on vertex v (includes both edges pointing to
      * and from v).

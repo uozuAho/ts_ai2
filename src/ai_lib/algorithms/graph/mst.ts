@@ -52,6 +52,10 @@ export class Mst implements IGraph {
         this._graph.add_edge(p, q, weight);
     }
 
+    public remove_edge(from: number, to: number) {
+        this._graph.remove_edge(from, to);
+    }
+
     public get_edges(): Edge[] {
         return this._edges;
     }

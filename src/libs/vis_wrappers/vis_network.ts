@@ -215,6 +215,7 @@ export class VisNode {
     /** y coordinate (canvas) */
     public y: number;
     public color: string;
+    public group: string | number;
 
     public constructor(id: string | number, label: string, x = 0, y = 0) {
         this.id = id;
