@@ -22,7 +22,13 @@ A traversal (?) of a directed graph with cycles will never terminate,
 unless some cycle termination criteria is specified, eg. each node
 in the cycle is visited 3 times.
 
+# Implementations
 
-# todo:
-- create a calculator that does better than naive even when dependency
-  cycles exist
+- cycle_calc got most of the way there, but sometimes has errors ordering cycles
+- scc_calc isn't quite finished, I got bored, but the idea is mostly there. Same
+  idea as cycle_calc, but this time I knew about 'strongly connected components' (SCC).
+  A graph of SCCs is constructed from the input graph, and a topological order of the
+  new graph is established. Orders of nodes within each SCC is determined by incrementally
+  removing edges from cycles until no cycles exist, then finding a topological order.
+  I don't think I proved that this would preserve the order of the nodes within the SCC,
+  but it sounds reasonable :P
