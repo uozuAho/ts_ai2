@@ -16,6 +16,12 @@
     *ngFor="let e of edges" />
 
   <!-- nodes -->
-  <circle [attr.cx]="node.x" [attr.cy]="node.y" r="20" fill="yellow" *ngFor="let node of nodes" />
+  <circle
+    [attr.cx]="node.x"
+    [attr.cy]="node.y"
+    fill="yellow"
+    class="node"
+    [ngClass]="{'node-highlighted': node.highlighted }"
+    *ngFor="let node of nodes" />
 
 </svg>

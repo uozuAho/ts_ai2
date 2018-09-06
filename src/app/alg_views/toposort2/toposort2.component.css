@@ -1,0 +1,11 @@
+.node {
+    r: 10;
+    fill: yellow;
+    transition: .75s ease-in-out 0s
+}
+
+.node-highlighted {
+    r: 20;
+    fill: blue;
+    transition: 0s ease-in-out 0s
+}
