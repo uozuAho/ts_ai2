@@ -5,10 +5,11 @@
     display: flex;
     flex-flow: column;
     height: 100%;
+    padding: 2%;
 }
 #box-steps {
     flex: 0 1 auto;
 }
-.box-graph {
+#box-graph {
     flex: 1 1 auto;
 }

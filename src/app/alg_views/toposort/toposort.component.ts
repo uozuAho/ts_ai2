@@ -100,11 +100,17 @@ export class ToposortComponent {
       const order = Array.from(this._topoSort.order());
       const nodes = this._originalGraph.get_nodes();
       this.showSvgGraph = true;
-      const xoffset = -Math.min(...nodes.map(n => n.x));
-      const yoffset = -Math.min(...nodes.map(n => n.y));
-      const toNode2d = (n: VisNode) => new Node2d(n.x + xoffset, n.y + yoffset);
-      const toEdge2d = (e: Edge) => new Edge2d(nodes[e.from].x + xoffset, nodes[e.to].x + xoffset,
-        nodes[e.from].y + yoffset, nodes[e.to].y + yoffset);
+      const nodeXs = nodes.map(n => n.x);
+      const nodeYs = nodes.map(n => n.y);
+      const xoffset = -Math.min(...nodeXs);
+      const yoffset = -Math.min(...nodeYs);
+      const xScale = 1000 / (Math.max(...nodeXs) - Math.min(...nodeXs));
+      const yScale = 1000 / (Math.max(...nodeYs) - Math.min(...nodeYs));
+      const toSvgX = x => xScale * (x + xoffset);
+      const toSvgY = y => yScale * (y + yoffset);
+      const toNode2d = (n: VisNode) => new Node2d(toSvgX(n.x), toSvgY(n.y));
+      const toEdge2d = (e: Edge) => new Edge2d(toSvgX(nodes[e.from].x), toSvgX(nodes[e.to].x),
+        toSvgY(nodes[e.from].y), toSvgY(nodes[e.to].y));
       this.svgnodes = nodes.map(n => toNode2d(n));
       this.svgedges = this._originalGraph.get_edges().map(e => toEdge2d(e));
       let idx = 0;
