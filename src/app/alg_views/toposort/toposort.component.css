@@ -9,6 +9,6 @@
 #box-steps {
     flex: 0 1 auto;
 }
-#box-editor {
+.box-graph {
     flex: 1 1 auto;
 }

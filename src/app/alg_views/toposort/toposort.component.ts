@@ -3,8 +3,9 @@ import { DiGraphT } from '../../../ai_lib/structures/graphT';
 import { GraphEditorComponent } from '../../shared/graph-editor/graph-editor.component';
 import { VisNode } from '../../../libs/vis_wrappers/vis_network';
 import { TopoSort } from '../../../ai_lib/algorithms/graph/toposort';
-import { TarjanSCC } from '../../../ai_lib/algorithms/graph/tarjan_scc';
 import { CycleOrderer } from './cycle_orderer';
+import { Node2d, Edge2d } from '../../shared/graph-svg/graph-svg.component';
+import { Edge } from '../../../ai_lib/structures/igraph';
 
 @Component({
   selector: 'app-toposort',
@@ -20,6 +21,10 @@ export class ToposortComponent {
   private _currentState: AlgViewerState;
   private _originalGraph: DiGraphT<VisNode>;
   private _topoSort: TopoSort;
+
+  public showSvgGraph = false;
+  public svgnodes: Node2d[] = [new Node2d(100, 100)];
+  public svgedges: Edge2d[];
 
   @ViewChild(GraphEditorComponent) private _graphEditor: GraphEditorComponent;
 
@@ -54,6 +59,7 @@ export class ToposortComponent {
     () => {
       this.currentStepText = 'Draw a graph';
       this.nextButtonText = 'Next';
+      this.showSvgGraph = false;
     },
     input => {
       switch (input) {
@@ -90,14 +96,25 @@ export class ToposortComponent {
     () => {
       this.currentStepText = 'Colouring nodes in topological order';
       this.nextButtonText = 'Next';
-      let idx = 0;
+
       const order = Array.from(this._topoSort.order());
       const nodes = this._originalGraph.get_nodes();
+      this.showSvgGraph = true;
+      const xoffset = -Math.min(...nodes.map(n => n.x));
+      const yoffset = -Math.min(...nodes.map(n => n.y));
+      const toNode2d = (n: VisNode) => new Node2d(n.x + xoffset, n.y + yoffset);
+      const toEdge2d = (e: Edge) => new Edge2d(nodes[e.from].x + xoffset, nodes[e.to].x + xoffset,
+        nodes[e.from].y + yoffset, nodes[e.to].y + yoffset);
+      this.svgnodes = nodes.map(n => toNode2d(n));
+      this.svgedges = this._originalGraph.get_edges().map(e => toEdge2d(e));
+      let idx = 0;
       this.showTopoOrderState.data.timer = setInterval(() => {
         const prevIdx = idx;
         if (++idx === order.length) { idx = 0; }
-        this._graphEditor.editNode(nodes[order[prevIdx]].id, n => n.color = 'blue');
-        this._graphEditor.editNode(nodes[order[idx]].id, n => n.color = 'red');
+        // this._graphEditor.editNode(nodes[order[prevIdx]].id, n => n.color = 'blue');
+        // this._graphEditor.editNode(nodes[order[idx]].id, n => n.color = 'red');
+        this.svgnodes[prevIdx].highlighted = false;
+        this.svgnodes[idx].highlighted = true;
       }, 300);
     },
     input => {
