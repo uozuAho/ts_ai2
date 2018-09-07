@@ -1,11 +1,15 @@
 .node {
-    r: 10;
-    fill: yellow;
+    r: 5;
+    fill: gray;
     transition: .75s ease-in-out 0s
 }
 
 .node-highlighted {
     r: 20;
-    fill: blue;
+    fill: red;
     transition: 0s ease-in-out 0s
+}
+
+.edge {
+    stroke: black;
 }

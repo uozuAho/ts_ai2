@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { DiGraphT } from '../../../ai_lib/structures/graphT';
 import { Edge } from '../../../ai_lib/structures/igraph';
+import { Node2d, Edge2d } from '../../shared/graph-svg/graph-svg.component';
 
-const NUM_NODES = 500;
+const NUM_NODES = 50;
 
 @Component({
   selector: 'app-toposort2',
   templateUrl: './toposort2.component.html',
-  styleUrls: ['./toposort2.component.css']
+  styleUrls: []
 })
 export class Toposort2Component {
 
@@ -37,7 +38,7 @@ export class Toposort2Component {
             }
             this.nodes[prev].highlighted = false;
             this.nodes[this._idx].highlighted = true;
-        }, 50);
+        }, 100);
     }
 
     private randomNode(): Node2d {
@@ -49,21 +50,4 @@ export class Toposort2Component {
         const to = this.nodes[e.to];
         return new Edge2d(from.x, to.x, from.y, to.y);
     }
-}
-
-class Node2d {
-    constructor(
-        public x: number,
-        public y: number,
-        public highlighted = false
-    ) {}
-}
-
-class Edge2d {
-    constructor (
-        public fromX: number,
-        public toX: number,
-        public fromY: number,
-        public toY: number
-     ) {}
 }
