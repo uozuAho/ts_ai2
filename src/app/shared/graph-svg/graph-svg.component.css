@@ -1,11 +1,13 @@
 svg {
-    /* constrain height, otherwise svg grows larger than screen */
+    /* constrain height, otherwise svg grows larger than screen
+       todo: how to make this adapt to parent element?
+    */
     max-height: 70vh;
 }
 .node {
-    r: 5;
+    r: 10;
     fill: gray;
-    transition: .75s ease-in-out 0s
+    transition: .5s ease-in-out 0s
 }
 
 .node-highlighted {

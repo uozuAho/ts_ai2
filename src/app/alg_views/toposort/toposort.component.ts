@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { DiGraphT } from '../../../ai_lib/structures/graphT';
 import { GraphEditorComponent } from '../../shared/graph-editor/graph-editor.component';
-import { VisNode } from '../../../libs/vis_wrappers/vis_network';
+import { VisNode, VisNetworkDef } from '../../../libs/vis_wrappers/vis_network';
 import { TopoSort } from '../../../ai_lib/algorithms/graph/toposort';
 import { CycleOrderer } from './cycle_orderer';
 import { Node2d, Edge2d } from '../../shared/graph-svg/graph-svg.component';
@@ -19,7 +19,8 @@ export class ToposortComponent {
   private nextButtonText = 'Done';
 
   private _currentState: AlgViewerState;
-  private _originalGraph: DiGraphT<VisNode>;
+  private _originalGraph: DiGraphT<VisNode> = null;
+  private _graphEditorBackup: VisNetworkDef = null;
   private _topoSort: TopoSort;
 
   public showSvgGraph = false;
@@ -60,27 +61,17 @@ export class ToposortComponent {
       this.currentStepText = 'Draw a graph';
       this.nextButtonText = 'Next';
       this.showSvgGraph = false;
+      if (this._graphEditorBackup !== null) {
+        // todo: this doesn't work since it's called before _graphEditor is (re)created by ngif
+        this._graphEditor.setGraph(this._graphEditorBackup);
+      }
     },
     input => {
       switch (input) {
         case StateInput.Next: {
           this._originalGraph = this._graphEditor.getDiGraph();
-          return this.toposortState;
-        }
-        default: return this._currentState;
-      }
-    }
-  );
-
-  private toposortState = new AlgViewerState(
-    () => {
-      this.currentStepText = 'Attempt to order the vertices with a topological sort';
-      this.nextButtonText = 'Next';
-      this._topoSort = new TopoSort(this._originalGraph);
-    },
-    input => {
-      switch (input) {
-        case StateInput.Next: {
+          this._graphEditorBackup = this._graphEditor.getVisNetworkDef();
+          this._topoSort = new TopoSort(this._originalGraph);
           if (this._topoSort.hasOrder()) {
             return this.showTopoOrderState;
           } else {
@@ -110,33 +101,14 @@ export class ToposortComponent {
     },
     input => {
       switch (input) {
-        case StateInput.Next: {
-          return this._currentState;
+        case StateInput.Back: {
+          return this.createGraphState;
         }
         default: return this._currentState;
       }
     },
     () => clearInterval(this.showTopoOrderState.data.timer)
   );
-
-  // update svg nodes and edges from the current graph editor
-  private setSvgGraph() {
-      const nodes = this._originalGraph.get_nodes();
-      const nodeXs = nodes.map(n => n.x);
-      const nodeYs = nodes.map(n => n.y);
-      // scale and offset to fit svg viewbox bounds (0, 1000)
-      const xoffset = -Math.min(...nodeXs);
-      const yoffset = -Math.min(...nodeYs);
-      const xScale = 1000 / (Math.max(...nodeXs) - Math.min(...nodeXs));
-      const yScale = 1000 / (Math.max(...nodeYs) - Math.min(...nodeYs));
-      const toSvgX = x => xScale * (x + xoffset);
-      const toSvgY = y => yScale * (y + yoffset);
-      const toNode2d = (n: VisNode) => new Node2d(toSvgX(n.x), toSvgY(n.y));
-      const toEdge2d = (e: Edge) => new Edge2d(toSvgX(nodes[e.from].x), toSvgX(nodes[e.to].x),
-        toSvgY(nodes[e.from].y), toSvgY(nodes[e.to].y));
-      this.svgnodes = nodes.map(n => toNode2d(n));
-      this.svgedges = this._originalGraph.get_edges().map(e => toEdge2d(e));
-  }
 
   private showSccOrderState = new AlgViewerState(
     () => {
@@ -162,11 +134,34 @@ export class ToposortComponent {
     },
     input => {
       switch (input) {
+        case StateInput.Back: {
+          return this.createGraphState;
+        }
         default: return this._currentState;
       }
     },
     () => clearInterval(this.showTopoOrderState.data.timer)
   );
+
+    // update svg nodes and edges from the current graph editor
+    private setSvgGraph() {
+      const nodes = this._originalGraph.get_nodes();
+      const nodeXs = nodes.map(n => n.x);
+      const nodeYs = nodes.map(n => n.y);
+      // scale and offset to fit svg viewbox bounds (0, 1000)
+      const margin = 30;
+      const xoffset = -Math.min(...nodeXs);
+      const yoffset = -Math.min(...nodeYs);
+      const xScale = (1000 - 2 * margin) / (Math.max(...nodeXs) - Math.min(...nodeXs));
+      const yScale = (1000 - 2 * margin) / (Math.max(...nodeYs) - Math.min(...nodeYs));
+      const toSvgX = x => xScale * (x + xoffset) + margin;
+      const toSvgY = y => yScale * (y + yoffset) + margin;
+      const toNode2d = (n: VisNode) => new Node2d(toSvgX(n.x), toSvgY(n.y));
+      const toEdge2d = (e: Edge) => new Edge2d(toSvgX(nodes[e.from].x), toSvgX(nodes[e.to].x),
+        toSvgY(nodes[e.from].y), toSvgY(nodes[e.to].y));
+      this.svgnodes = nodes.map(n => toNode2d(n));
+      this.svgedges = this._originalGraph.get_edges().map(e => toEdge2d(e));
+  }
 }
 
 enum StateInput {
