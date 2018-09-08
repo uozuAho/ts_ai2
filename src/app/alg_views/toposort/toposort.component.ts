@@ -98,27 +98,12 @@ export class ToposortComponent {
       this.nextButtonText = 'Next';
 
       const order = Array.from(this._topoSort.order());
-      const nodes = this._originalGraph.get_nodes();
       this.showSvgGraph = true;
-      const nodeXs = nodes.map(n => n.x);
-      const nodeYs = nodes.map(n => n.y);
-      const xoffset = -Math.min(...nodeXs);
-      const yoffset = -Math.min(...nodeYs);
-      const xScale = 1000 / (Math.max(...nodeXs) - Math.min(...nodeXs));
-      const yScale = 1000 / (Math.max(...nodeYs) - Math.min(...nodeYs));
-      const toSvgX = x => xScale * (x + xoffset);
-      const toSvgY = y => yScale * (y + yoffset);
-      const toNode2d = (n: VisNode) => new Node2d(toSvgX(n.x), toSvgY(n.y));
-      const toEdge2d = (e: Edge) => new Edge2d(toSvgX(nodes[e.from].x), toSvgX(nodes[e.to].x),
-        toSvgY(nodes[e.from].y), toSvgY(nodes[e.to].y));
-      this.svgnodes = nodes.map(n => toNode2d(n));
-      this.svgedges = this._originalGraph.get_edges().map(e => toEdge2d(e));
+      this.setSvgGraph();
       let idx = 0;
       this.showTopoOrderState.data.timer = setInterval(() => {
         const prevIdx = idx;
         if (++idx === order.length) { idx = 0; }
-        // this._graphEditor.editNode(nodes[order[prevIdx]].id, n => n.color = 'blue');
-        // this._graphEditor.editNode(nodes[order[idx]].id, n => n.color = 'red');
         this.svgnodes[prevIdx].highlighted = false;
         this.svgnodes[idx].highlighted = true;
       }, 300);
@@ -134,6 +119,25 @@ export class ToposortComponent {
     () => clearInterval(this.showTopoOrderState.data.timer)
   );
 
+  // update svg nodes and edges from the current graph editor
+  private setSvgGraph() {
+      const nodes = this._originalGraph.get_nodes();
+      const nodeXs = nodes.map(n => n.x);
+      const nodeYs = nodes.map(n => n.y);
+      // scale and offset to fit svg viewbox bounds (0, 1000)
+      const xoffset = -Math.min(...nodeXs);
+      const yoffset = -Math.min(...nodeYs);
+      const xScale = 1000 / (Math.max(...nodeXs) - Math.min(...nodeXs));
+      const yScale = 1000 / (Math.max(...nodeYs) - Math.min(...nodeYs));
+      const toSvgX = x => xScale * (x + xoffset);
+      const toSvgY = y => yScale * (y + yoffset);
+      const toNode2d = (n: VisNode) => new Node2d(toSvgX(n.x), toSvgY(n.y));
+      const toEdge2d = (e: Edge) => new Edge2d(toSvgX(nodes[e.from].x), toSvgX(nodes[e.to].x),
+        toSvgY(nodes[e.from].y), toSvgY(nodes[e.to].y));
+      this.svgnodes = nodes.map(n => toNode2d(n));
+      this.svgedges = this._originalGraph.get_edges().map(e => toEdge2d(e));
+  }
+
   private showSccOrderState = new AlgViewerState(
     () => {
       this.currentStepText = `Showing 'scc' order. Note that this orders strongly-connected components
@@ -146,13 +150,14 @@ export class ToposortComponent {
       const order = Array.from(sccOrder.order());
 
       // show order
+      this.showSvgGraph = true;
+      this.setSvgGraph();
       let idx = 0;
-      const nodes = graph.get_nodes();
       this.showTopoOrderState.data.timer = setInterval(() => {
         const prevIdx = idx;
         if (++idx === order.length) { idx = 0; }
-        this._graphEditor.editNode(nodes[order[prevIdx]].id, n => n.color = 'blue');
-        this._graphEditor.editNode(nodes[order[idx]].id, n => n.color = 'red');
+        this.svgnodes[order[prevIdx]].highlighted = false;
+        this.svgnodes[order[idx]].highlighted = true;
       }, 300);
     },
     input => {
