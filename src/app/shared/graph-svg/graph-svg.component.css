@@ -1,8 +1,7 @@
-#graphsvg {
-    height: 100%;
-    width: 100%;
+svg {
+    /* constrain height, otherwise svg grows larger than screen */
+    max-height: 70vh;
 }
-
 .node {
     r: 5;
     fill: gray;
