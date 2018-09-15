@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, AfterViewInit } from '@angular/core';
 import { DiGraphT } from '../../../ai_lib/structures/graphT';
 import { GraphEditorComponent } from '../../shared/graph-editor/graph-editor.component';
 import { VisNode, VisNetworkDef } from '../../../libs/vis_wrappers/vis_network';
@@ -12,7 +12,7 @@ import { Edge } from '../../../ai_lib/structures/igraph';
   templateUrl: './toposort.component.html',
   styleUrls: ['./toposort.component.css']
 })
-export class ToposortComponent {
+export class ToposortComponent implements AfterViewInit {
 
   private currentStepText: string;
   private backButtonText = 'Back';
@@ -31,6 +31,11 @@ export class ToposortComponent {
 
   constructor() {
     this.reset();
+  }
+
+  ngAfterViewInit(): void {
+    console.log('yo');
+    console.log(this._graphEditor);
   }
 
   private reset() {
@@ -62,8 +67,11 @@ export class ToposortComponent {
       this.nextButtonText = 'Next';
       this.showSvgGraph = false;
       if (this._graphEditorBackup !== null) {
-        // todo: this doesn't work since it's called before _graphEditor is (re)created by ngif
-        this._graphEditor.setGraph(this._graphEditorBackup);
+        setTimeout(() => {
+          // hack: wait a bit before setting graph, to make sure the graph element is loaded
+          // todo: is there an event i can hook into instead???
+          this._graphEditor.setGraph(this._graphEditorBackup);
+        }, 100);
       }
     },
     input => {
