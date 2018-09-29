@@ -11,7 +11,6 @@ import { MstComponent } from './alg_views/graph_general/mst/mst.component';
 import { TspComponent } from './alg_views/graph_general/tsp/tsp.component';
 import { PandemicComponent } from './games/pandemic/pandemic.component';
 import { ToposortComponent } from './alg_views/toposort/toposort.component';
-import { Toposort2Component } from './alg_views/toposort2/toposort2.component';
 import { SccComponent } from './alg_views/graph_general/scc/scc.component';
 
 const routes: Routes = [
@@ -26,7 +25,6 @@ const routes: Routes = [
   { path: 'graph_general/scc', component: SccComponent },
   { path: 'games/pandemic', component: PandemicComponent },
   { path: 'toposort', component: ToposortComponent },
-  { path: 'toposort2', component: Toposort2Component },
 ];
 
 @NgModule({

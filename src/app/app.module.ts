@@ -21,7 +21,6 @@ import { TspComponent } from './alg_views/graph_general/tsp/tsp.component';
 import { PandemicComponent } from './games/pandemic/pandemic.component';
 import { PandemicDrawerComponent } from './games/pandemic/pandemic_drawer';
 import { ToposortComponent } from './alg_views/toposort/toposort.component';
-import { Toposort2Component } from './alg_views/toposort2/toposort2.component';
 import { SccComponent } from './alg_views/graph_general/scc/scc.component';
 import { GraphSvgComponent } from './shared/graph-svg/graph-svg.component';
 
@@ -42,7 +41,6 @@ import { GraphSvgComponent } from './shared/graph-svg/graph-svg.component';
     PandemicComponent,
     PandemicDrawerComponent,
     ToposortComponent,
-    Toposort2Component,
     SccComponent,
     GraphSvgComponent
   ],
