@@ -4,11 +4,10 @@
 #box-container {
     display: flex;
     flex-flow: column;
-    height: 100%;
 }
 #box-steps {
     flex: 0 1 auto;
 }
-#box-editor {
+#box-graph {
     flex: 1 1 auto;
 }

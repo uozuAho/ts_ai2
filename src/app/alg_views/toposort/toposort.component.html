@@ -9,7 +9,8 @@
       <button mat-button (click)="reset()">Reset</button>
     </div>
   </div>
-  <div id="box-editor">
-    <app-graph-editor></app-graph-editor>
+  <div id="box-graph">
+    <app-graph-editor *ngIf="!showSvgGraph"></app-graph-editor>
+    <app-graph-svg [nodes]="svgnodes" [edges]="svgedges" *ngIf="showSvgGraph"></app-graph-svg>
   </div>
 </div>

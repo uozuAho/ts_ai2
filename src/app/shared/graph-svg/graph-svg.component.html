@@ -1,0 +1,24 @@
+<svg id="graphsvg"
+     version="1.1"
+     baseProfile="full"
+     viewBox="0 0 1000 1000"
+     xmlns="http://www.w3.org/2000/svg">
+
+  <!-- edges -->
+  <line
+    class="edge"
+    [attr.x1]="e.fromX"
+    [attr.y1]="e.fromY"
+    [attr.x2]="e.toX"
+    [attr.y2]="e.toY"
+    *ngFor="let e of edges" />
+
+  <!-- nodes -->
+  <circle
+    class="node"
+    [attr.cx]="node.x"
+    [attr.cy]="node.y"
+    [ngClass]="{'node-highlighted': node.highlighted }"
+    *ngFor="let node of nodes" />
+
+</svg>

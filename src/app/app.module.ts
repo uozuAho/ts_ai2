@@ -22,6 +22,7 @@ import { PandemicComponent } from './games/pandemic/pandemic.component';
 import { PandemicDrawerComponent } from './games/pandemic/pandemic_drawer';
 import { ToposortComponent } from './alg_views/toposort/toposort.component';
 import { SccComponent } from './alg_views/graph_general/scc/scc.component';
+import { GraphSvgComponent } from './shared/graph-svg/graph-svg.component';
 
 
 @NgModule({
@@ -40,7 +41,8 @@ import { SccComponent } from './alg_views/graph_general/scc/scc.component';
     PandemicComponent,
     PandemicDrawerComponent,
     ToposortComponent,
-    SccComponent
+    SccComponent,
+    GraphSvgComponent
   ],
   imports: [
     AppRoutingModule,
